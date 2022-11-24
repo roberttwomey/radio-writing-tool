@@ -20,7 +20,7 @@ npm install -g express
 
 ### Running with pm2
 
-Start the writing:
+Start the app:
 ```
 pm2 start writing-tool.js
 ```
