@@ -5,6 +5,9 @@
 // Speech Object
 //let speechRec;
 
+
+let socket;
+
 let gridState = 0;
 
 let gridSizes = [
@@ -12,17 +15,24 @@ let gridSizes = [
   [ "1 / 5", "5 / 6", "6 / 7", "5 / 6"],
   [ "1 / 2", "2 / 6", "6 / 7", "2 / 6"],
   [ "1 / 2", "2 / 3", "3 / 7", "2 / 3"],
-];
+  ];
 
 let lastSelected = "";
 
 function setup() {
   noCanvas();
   
-  // addEventListener version
-  // document.addEventListener('selectionchange', () => {
-  //   console.log(document.getSelection());
-  // });
+  // Start the socket connection
+  socket = io.connect('http://localhost:8080')
+
+  // Callback function
+  socket.on('completion', data => {
+    // console.log("received completion: "+data);
+    let completion = data["completion"]
+    console.log("received completion: "+completion);
+    let targetDiv = select("#completion");
+    targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
+  })
 
   document.addEventListener('selectionchange', () => updateSelection());
   
@@ -68,9 +78,33 @@ function setup() {
 // do completion
 
 function doCompletion() {
-  let prompt = select("#prompt");
-  let completion = select("#completion");
-  completion.html("<p>"+prompt.html()+"</p>", true);
+  // let promptDiv = select("#prompt");
+  let promptDiv = document.getElementById("prompt");
+  
+  // let completion = select("#completion");
+  // completion.html("<p>"+prompt.html()+"</p>", true);
+
+  // let prompt = promptDiv.html();
+
+  // convert paragraph elements <p> to lines with newlines
+  let paragraphs = Array.from(promptDiv.getElementsByTagName("p"));
+  // console.log(paragraphs);
+
+  let prompt = ""
+  for(let i = 0; i < paragraphs.length; i++) {
+    // console.log("paragraphs "+i+" "+paragraphs[i].innerText) // Will print the content of each paragraph
+    prompt+=paragraphs[i].innerText+"\n";
+  }
+
+  console.log("prompting: "+prompt);
+  const data = {
+    prompt: prompt
+  }
+  
+  // prompt the server with the data
+  socket.emit('prompt', data);
+
+  // promptGPT3(prompt.html().toString());
 }
 
 function copyTo(thisClass) {
@@ -87,7 +121,15 @@ function copyTo(thisClass) {
   
   console.log("copy \""+lastSelected+"\" to "+target);
   let targetDiv = select(target);
-  targetDiv.html("<p contenteditable='true'>"+lastSelected+"</p>", true);
+
+  // iterate over lines if we are dealing with a multi-line selection
+  const lines = lastSelected.split(/\r?\n/);
+  console.log(lines);
+  lines.forEach((thisline, i) => { 
+    if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+  });
+
+  // targetDiv.html("<p>"+lastSelected+"</p>", true);
   
   lastSelected = "";
 }
@@ -136,45 +178,12 @@ function updateGridState() {
 
 // select and copy text
 
-// function mouseReleased() {
-  
-//   if (window.getSelection()) {
-//     let thisText = window.getSelection().toString();
-//     if (thisText != "") {
-//       console.log("last selected: "+thisText);
-//       lastSelected = thisText;  
-//     }
-//   }
-// }
-
 function updateSelection() {
-  let thisText = document.getSelection().toString();
+  // let thisText = document.getSelection().toString();
+  let thisText = document.getSelection().toString()
+  console.log(thisText);
   if (thisText != "") {
-    console.log("last selected: "+thisText);
+    // console.log("last selected: "+thisText);
     lastSelected = thisText;  
   }
 }
-
-function elementContainsSelection(el) {
-    let sel = window.getSelection();
-    if (sel.rangeCount > 0) {
-        for (let i = 0; i < sel.rangeCount; ++i) {
-            if (!el.contains(sel.getRangeAt(i).commonAncestorContainer)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
-// function keyPressed() {
-  
-// }
-
-// function keyPressed() {
-//   if (keyCode === DELETE || keyCode == BACKSPACE) {
-//     let selection = window.getSelection();
-//     selection.deleteFromDocument();
-//   }
-// }

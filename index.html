@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Radio Writing Tool</title>
-
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
     <script src="libraries/p5.speech.js"></script>
@@ -27,9 +27,9 @@
             </div>
             <div style="clear: both;"></div>
           </h1>
-          <p id="script" contenteditable="true">
-            SPEAKER 1: Lorem ipsem test test.
-          </p>
+          <div id="script" contenteditable="true">
+            <p>SPEAKER 1: Lorem ipsem test test.</p>
+          </div>
         </div>
         <div class="box box2">
           <h1>
@@ -41,7 +41,9 @@
             </div>
             <div style="clear: both;"></div>
           </h1>
-          <p id="prompt" contenteditable="true"></p>
+          <div id="prompt" contenteditable="true">
+            <p>This is a placeholder.</p>
+          </div>
         </div>
         <div class="box box3">
           <h1>
@@ -53,13 +55,17 @@
             </div>
             <div style="clear: both;"></div>
           </h1>
-          <p id="speech" contenteditable="true"></p>
+          <div id="speech" contenteditable="true">
+            <p>Speech results show up here</p>
+          </div>
         </div>
         <div class="box box4">
           <div class="unselectable">
             <h1 onclick="doCompletion();">Completion</h1>
           </div>
-          <p id="completion" contenteditable="true"></p>
+          <div id="completion" contenteditable="true">
+            <p>this is a placeholder</p>
+          </div>
         </div>
       </div>
     </main>
