@@ -13,8 +13,8 @@ open `localhost:8080` in Safari (speechRec isn't working in edge)
 
 ### Node app with pm2
 
-`npm install pm2 -g`
-`npm install -g express`
+```npm install pm2 -g
+npm install -g express```
 
 ## References
 - Deploying p5 sketch with node: https://github.com/processing/p5.js/wiki/p5.js,-node.js,-socket.io
