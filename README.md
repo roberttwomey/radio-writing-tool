@@ -18,6 +18,23 @@ npm install pm2 -g
 npm install -g express
 ```
 
+### Running with pm2
+
+Start the writing:
+```
+pm2 start writing-tool.js
+```
+
+Inspect the log:
+```
+pm2 log writing-tool.js
+```
+
+Stop the writing tool:
+```
+pm2 stop writing-tool.js
+```
+
 ## References
 - Deploying p5 sketch with node: https://github.com/processing/p5.js/wiki/p5.js,-node.js,-socket.io
 
