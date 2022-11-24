@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>01_basics</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+    <script src="libraries/p5.speech.js"></script>
+    <script src="sketch.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <main>
+      <div class="wrapper">
+        <div class="box box1">
+          <h1>
+            <div class="alignleft unselectable" onclick="copyTo('box1');">
+              Performance Script
+            </div>
+            <div class="alignright" onclick="toggleState('box1');">
+              &#x2194;
+            </div>
+            <div style="clear: both;"></div>
+          </h1>
+          <p id="script" contenteditable="true">
+            SPEAKER 1: Lorem ipsem test test.
+          </p>
+        </div>
+        <div class="box box2">
+          <h1>
+            <div class="alignleft unselectable" onclick="copyTo('box2');">
+              Prompt
+            </div>
+            <div class="alignright" onclick="toggleState('box2');">
+              &#x2194;
+            </div>
+            <div style="clear: both;"></div>
+          </h1>
+          <p id="prompt" contenteditable="true"></p>
+        </div>
+        <div class="box box3">
+          <h1>
+            <div class="alignleft unselectable" onclick="copyTo('box3');">
+              Transcribed Speech
+            </div>
+            <div class="alignright" onclick="toggleState('box3');">
+              &#x2194;
+            </div>
+            <div style="clear: both;"></div>
+          </h1>
+          <p id="speech" contenteditable="true"></p>
+        </div>
+        <div class="box box4">
+          <div class="unselectable">
+            <h1 onclick="doCompletion();">Completion</h1>
+          </div>
+          <p id="completion" contenteditable="true"></p>
+        </div>
+      </div>
+    </main>
+    <script src="sketch.js"></script>
+  </body>
+</html>
