@@ -18,6 +18,15 @@ npm install pm2 -g
 npm install -g express
 ```
 
+### Setup
+You need to create a .env file in the same folder as this code before running it. Should contain your OPENAI_API_KEY
+
+.env
+
+```
+OPENAI_API_KEY=XXXXXX
+```
+
 ### Running with pm2
 
 Start the app:
