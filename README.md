@@ -1,13 +1,33 @@
 # radio-writing-tool
 AI Co-Authoring tool for Radio Play
 
+## Setup
+
+### Clone the repository
+
+```git clone https://github.com/roberttwomey/radio-writing-tool```
+
+### Create an env file with your openai key
+
+```
+touch .env
+```
+
+In the file, copy the following text. Replace XXXXXX with your openai api key (copied from your openai account)
+
+```
+OPENAI_API_KEY=XXXXXX
+```
+
 ## Usage
 
-### Basic HTML app
+### Run it from the command line with node.js
 
+**setup**:
 `npm install http-server -g`
-
 `http-server` 
+
+***Visit in Browser***
 
 open `localhost:8080` in Safari (speechRec isn't working in edge)
 
@@ -18,14 +38,7 @@ npm install pm2 -g
 npm install -g express
 ```
 
-### Setup
-You need to create a .env file in the same folder as this code before running it. Should contain your OPENAI_API_KEY
 
-.env
-
-```
-OPENAI_API_KEY=XXXXXX
-```
 
 ### Running with pm2
 
