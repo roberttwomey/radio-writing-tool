@@ -6,6 +6,7 @@
 //let speechRec;
 
 
+
 let socket;
 
 let gridState = 0;
@@ -18,6 +19,9 @@ let gridSizes = [
   ];
 
 let lastSelected = "";
+
+let bSpeaking = false;
+let bListening = true;
 
 function setup() {
   noCanvas();
@@ -36,43 +40,48 @@ function setup() {
 
   document.addEventListener('selectionchange', () => updateSelection());
   
-  // Create a Speech Recognition object with callback
-  speechRec = new p5.SpeechRec("en-US", gotSpeech);
-  // "Continuous recognition" (as opposed to one time only)
-  let continuous = true;
-  // If you want to try partial recognition (faster, less accurate)
-  let interimResults = true;
-  // This must come after setting the properties
-  speechRec.start(continuous, interimResults);
+  speechRec.addEventListener('end', () => startListening());
+  speechRec.start(true, true);
+  // speechRec.start(true, true);
 
-  // DOM element to display results
-  let output = select("#speech");
+  // // Create a Speech Recognition object with callback
+  // speechRec = new p5.SpeechRec("en-US", gotSpeech);
+  // // "Continuous recognition" (as opposed to one time only)
+  // let continuous = true;
+  // // If you want to try partial recognition (faster, less accurate)
+  // let interimResults = true;
 
-  let lastHtml = "";
-  let count = 0;
+  // // // This must come after setting the properties
+  // speechRec.start(continuous, interimResults);
 
-  console.log("listening...");
-  // Speech recognized event
-  function gotSpeech() {
-    // Something is there
-    // Get it as a string, you can also get JSON with more info
-    console.log(speechRec);
+  // // DOM element to display results
+  // let output = select("#speech");
 
-    if (speechRec.resultValue) {
-      let said = speechRec.resultString;
-      if (speechRec.resultJSON.results[count].isFinal) {
-        // final, add to html
-        let newHtml = lastHtml + "<p>" + said + "</p>";
-        output.html(newHtml);
-        lastHtml = newHtml;
-        count += 1;
-      } else {
-        // temp, add in light gray
-        let tempOutput = lastHtml + "<p style='color: gray'>" + said + '</p>';
-        output.html(tempOutput);
-      }
-    }
-  }
+  // let lastHtml = "";
+  // let count = 0;
+
+  // console.log("listening...");
+  // // Speech recognized event
+  // function gotSpeech() {
+  //   // Something is there
+  //   // Get it as a string, you can also get JSON with more info
+  //   console.log(speechRec);
+
+  //   if (speechRec.resultValue) {
+  //     let said = speechRec.resultString;
+  //     if (speechRec.resultJSON.results[count].isFinal) {
+  //       // final, add to html
+  //       let newHtml = lastHtml + "<p>" + said + "</p>";
+  //       output.html(newHtml);
+  //       lastHtml = newHtml;
+  //       count += 1;
+  //     } else {
+  //       // temp, add in light gray
+  //       let tempOutput = lastHtml + "<p style='color: gray'>" + said + '</p>';
+  //       output.html(tempOutput);
+  //     }
+  //   }
+  // }
 }
 
 // do completion
@@ -132,6 +141,46 @@ function copyTo(thisClass) {
   // targetDiv.html("<p>"+lastSelected+"</p>", true);
   
   lastSelected = "";
+}
+
+
+function toggleSpeaking(thisClass) {
+  // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
+  let thissymbol = document.getElementsByClassName("speaking")[0];
+  if (bSpeaking) {
+    console.log("speaking off");
+    thissymbol.innerHTML = '<i class="myfa fa fa-toggle-off"></i>';
+    bSpeaking = false;
+  } else {
+    console.log("speaking on");
+    thissymbol.innerHTML = '<i class="myfa fa fa-toggle-on"></i>';
+    bSpeaking = true;
+  }
+}
+
+function toggleListening() {
+  if (bListening) {
+    stopListening()
+  } else {
+    startListening();
+  }
+}
+
+function stopListening() {
+  console.log("listening off");
+  let thissymbol = document.getElementsByClassName("listening")[0];
+  thissymbol.innerHTML = '<i class="myfa fa fa-microphone-slash"></i>';
+  bListening = false;
+  // speechRec.removeEventListener('end', startListening());
+  speechRec.stop();
+}
+
+function startListening() {
+  console.log("listening on");
+  let thissymbol = document.getElementsByClassName("listening")[0];
+  thissymbol.innerHTML = '<i class="myfa fa fa-microphone"></i>';
+  bListening = true;
+  speechRec.start(true, true);
 }
 
 // adjusting size of panes

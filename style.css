@@ -118,3 +118,11 @@ p {
   font-size: 1.5em;
   cursor: pointer;
 }
+
+.myfa{
+  font-size:24px;
+  /* padding:16px; */
+  /* margin: 0 10px; */
+  color:#444;
+  /* text-shadow: 2px 2px 6px rgba(0,0,0,0.38); */
+}
