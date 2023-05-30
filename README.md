@@ -1,5 +1,7 @@
 # radio-writing-tool
-AI Co-Authoring tool for Radio Play
+AI Co-Authoring tool for live performance
+
+<img src="https://github.com/roberttwomey/radio-writing-tool/assets/1598545/18170df0-b995-4de0-b2aa-fe152d1d0c72" width=800>
 
 ## Setup
 
