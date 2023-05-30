@@ -19,25 +19,28 @@ In the file, copy the following text. Replace XXXXXX with your openai api key (c
 OPENAI_API_KEY=XXXXXX
 ```
 
-## Usage
+### Node setup
 
-### Run it from the command line with node.js
+Install node.js
 
-**setup**:
-`npm install http-server -g`
-`http-server` 
-
-***Visit in Browser***
-
-open `localhost:8080` in Safari (speechRec isn't working in edge)
-
-### Node app with pm2
-
+Install node packages:
 ```
+npm install http-server -g
 npm install pm2 -g
 npm install -g express
 ```
 
+## Usage
+Run it: 
+```
+node writing-server.js
+``` 
+
+*Visit in Browser*
+
+open `localhost:8080` in Safari (speechRec isn't working in edge)
+
+<img width="800" alt="browser view of app with three columns" src="https://github.com/roberttwomey/radio-writing-tool/assets/1598545/cca785e4-cf63-4efc-a529-e0c34f678498">
 
 
 ### Running with pm2
@@ -56,6 +59,10 @@ Stop the writing tool:
 ```
 pm2 stop writing-tool.js
 ```
+## Usage
+
+Open in Browser (on mac, Safari or Chrome best implements webSpeech):
+
 
 ## References
 - Deploying p5 sketch with node: https://github.com/processing/p5.js/wiki/p5.js,-node.js,-socket.io
