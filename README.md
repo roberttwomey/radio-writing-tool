@@ -61,6 +61,14 @@ Stop the writing tool:
 ```
 pm2 stop writing-tool.js
 ```
+
+## read logs
+
+logs are in 
+```
+~/.pm2/logs
+```
+
 ## Usage
 
 Open in Browser (on mac, Safari or Chrome best implement webSpeech):

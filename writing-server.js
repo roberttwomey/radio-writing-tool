@@ -99,7 +99,8 @@ function promptGPT3(thisprompt, socket) {
   let prompt = thisprompt;
 
   const gpt_args = {
-    model: "text-davinci-002",
+    // model: "text-davinci-002",
+    model: "gpt-3.5-turbo",
     prompt: prompt,
     max_tokens: 256,
     temperature: 0.7,
