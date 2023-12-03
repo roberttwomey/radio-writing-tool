@@ -63,10 +63,9 @@ pm2 stop writing-tool.js
 ```
 ## Usage
 
-Open in Browser (on mac, Safari or Chrome best implements webSpeech):
+Open in Browser (on mac, Safari or Chrome best implement webSpeech):
 
 
 ## References
 - Deploying p5 sketch with node: https://github.com/processing/p5.js/wiki/p5.js,-node.js,-socket.io
-
 - PM2 to deploy a sketch: https://pm2.keymetrics.io/
