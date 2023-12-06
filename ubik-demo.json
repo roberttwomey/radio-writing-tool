@@ -1,7 +1,17 @@
-{
-    "ubik": {
-        "type": "gen",
-        "prompt": "choose one type of product: home or beauty or auto or office or lifestyle or fashion or health.\\n write a short advertisement for that product, called Ubik. three sentences long."
-    },
-    
+{ 
+    "paragraphs": [
+        {
+            "type": "prompt",
+            "text": "choose one type of product: home or beauty or auto or office or lifestyle or fashion or health.\nwrite a short advertisement for that product, called Ubik. three sentences long."
+
+        },
+        {
+            "type": "text",
+            "text": "this is a test text"
+        },
+        {
+            "type": "text",
+            "text": "some dialog with runciter"
+        }
+    ]
 }

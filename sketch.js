@@ -18,13 +18,18 @@ let gridSizes = [
 
 let lastSelected = "";
 
-let bSpeaking = false;
+let bSpeaking = true;
 let bListening = true;
+let script;
+
+function preload() {
+  script = loadJSON("ubik-demo.json");
+}
 
 function setup() {
   noCanvas();
   
-  // Start the socket connection
+  // Start the socket connection for gpt3 server completion
   socket = io.connect('http://localhost:8080')
 
   // Callback function
@@ -43,6 +48,9 @@ function setup() {
   
   // don't listen by default
   toggleListening();
+  toggleSpeaking();
+
+  parseScript(script);
   // speechRec.start(true, true);
 
   // // Create a Speech Recognition object with callback
@@ -85,6 +93,43 @@ function setup() {
   // }
 }
 
+function parseScript(script) {
+  data = script;
+  console.log(data);
+
+  let targetDiv = select("#script");
+
+  // iterate over lines if we are dealing with a multi-line selection
+  
+  for (let i=0; i<data.paragraphs.length; i++) {
+    // console.log(data.paragraphs[i]);
+    thisType = data.paragraphs[i].type;
+    thisChunk = data.paragraphs[i].text;
+    const lines = thisChunk.split(/\r?\n/);
+    // console.log(lines);
+    let thishtml;
+    if (thisType == "prompt") {
+      // targetDiv.html("<div style='color: green'><p>prompt [</p>", true);
+      thishtml = "<div style='color: green'><p>prompt [</p>";
+    }
+    lines.forEach((thisline, i) => { 
+      if (thisType == "prompt") {
+        // if (thisline) targetDiv.html("<p>&nbsp&nbsp"+thisline+"</p>", true)
+        if (thisline) thishtml += "<p>&nbsp&nbsp"+thisline+"</p>";
+      } else {
+        // if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+        if (thisline) thishtml += "<p>"+thisline+"</p>";
+      }
+    });
+    if (thisType == "prompt") {
+      // targetDiv.html("<p>prompt ]</p></div>", true);
+      thishtml += "<p>prompt ]</p></div>";
+    }
+    if (thishtml) targetDiv.html(thishtml, true);
+  };
+}
+
+
 // do completion
 
 function doCompletion() {
@@ -120,6 +165,8 @@ function doCompletion() {
 function copyTo(thisClass) {
   if(thisClass == "box1") {
     target = "#script";
+    if (bSpeaking)
+      sayAndListen(lastSelected);
   } else if (thisClass == "box2") {
     target = "#prompt";
   } else if (thisClass == "box3") {

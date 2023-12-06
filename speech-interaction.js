@@ -62,7 +62,7 @@ speechRec.onresult = (event) => {
 };
 
 // // synthesis
-// const speechSynth = window.speechSynthesis;
+const speechSynth = window.speechSynthesis;
 
 // function processSpeech(said) {
 //   // said contains the string that was heard
@@ -114,29 +114,30 @@ speechRec.onresult = (event) => {
 //   sayAndListen(story[thisState].text);
 // }
 
-// function sayAndListen(thistext) {
-//   const utterThis = new SpeechSynthesisUtterance(thistext);
-//   utterThis.onend = (event) => {
-//     console.log(
-//       `Utterance has finished being spoken after ${event.elapsedTime} seconds.`
-//     );
+function sayAndListen(thistext) {
+  const utterThis = new SpeechSynthesisUtterance(thistext);
+  utterThis.onend = (event) => {
+    console.log(
+      `Utterance has finished being spoken after ${event.elapsedTime} seconds.`
+    );
 
-//     console.log("... now listening ...");
-//     // toggleRecButton();
+    console.log("... now listening ...");
+    // toggleRecButton();
 
-//     recbtn.style('background-color', 'red');
-//     speechoutput.html("(speak now)");
-//     speechoutput.style("color", "gray");
+    // recbtn.style('background-color', 'red');
+    // speechoutput.html("(speak now)");
+    // speechoutput.style("color", "gray");
 
-//     // speechRec.addEventListener('end', speechRec.start(false, true));
-//     // speechRec.start(false, true);
-//     // speechRec.addEventListener('end', () => speechRec.start(false, true)); 
-//     speechRec.addEventListener('end', () => stopListening()); 
-//     speechRec.start(false, true);
-//   };
+    // speechRec.addEventListener('end', speechRec.start(false, true));
+    // speechRec.start(false, true);
+    // speechRec.addEventListener('end', () => speechRec.start(false, true)); 
+    // speechRec.addEventListener('end', () => stopListening()); 
+    if (!bListening)
+      speechRec.start(false, true);
+  };
   
-//   speechSynth.speak(utterThis);
-// }
+  speechSynth.speak(utterThis);
+}
 
 // // function sayAndStartRadio(thistext) {
 // //   const utterThis = new SpeechSynthesisUtterance(thistext);
