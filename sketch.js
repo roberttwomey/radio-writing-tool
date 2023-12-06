@@ -39,6 +39,8 @@ function setup() {
     console.log("received completion: "+completion);
     let targetDiv = select("#completion");
     targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
+    let scriptTargetDiv = select("#gen1");
+    scriptTargetDiv.html("<p contenteditable='true'>"+completion+"</p>")
   })
 
   document.addEventListener('selectionchange', () => updateSelection());
@@ -99,10 +101,13 @@ function parseScript(script) {
 
   let targetDiv = select("#script");
 
+  targetDiv.html("");
+  
   // iterate over lines if we are dealing with a multi-line selection
   
   for (let i=0; i<data.paragraphs.length; i++) {
     // console.log(data.paragraphs[i]);
+    thisId = data.paragraphs[i].id;
     thisType = data.paragraphs[i].type;
     thisChunk = data.paragraphs[i].text;
     const lines = thisChunk.split(/\r?\n/);
@@ -110,7 +115,7 @@ function parseScript(script) {
     let thishtml = "";
     if (thisType == "prompt") {
       // targetDiv.html("<div style='color: green'><p>prompt [</p>", true);
-      thishtml = "<div style='color: green'>";
+      thishtml = "<div style='color: green' id=\""+thisId+"\">";
       lines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
@@ -179,7 +184,8 @@ function copyTo(thisClass) {
   // iterate over lines if we are dealing with a multi-line selection
   const lines = lastSelected.split(/\r?\n/);
   console.log(lines);
-  lines.forEach((thisline, i) => { 
+  if (target == "#prompt") targetDiv.html("")
+  lines.forEach((thisline, i) => {
     if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
   });
 
