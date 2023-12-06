@@ -107,24 +107,21 @@ function parseScript(script) {
     thisChunk = data.paragraphs[i].text;
     const lines = thisChunk.split(/\r?\n/);
     // console.log(lines);
-    let thishtml;
+    let thishtml = "";
     if (thisType == "prompt") {
       // targetDiv.html("<div style='color: green'><p>prompt [</p>", true);
-      thishtml = "<div style='color: green'><p>prompt [</p>";
-    }
-    lines.forEach((thisline, i) => { 
-      if (thisType == "prompt") {
-        // if (thisline) targetDiv.html("<p>&nbsp&nbsp"+thisline+"</p>", true)
-        if (thisline) thishtml += "<p>&nbsp&nbsp"+thisline+"</p>";
-      } else {
-        // if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+      thishtml = "<div style='color: green'>";
+      lines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
-      }
-    });
-    if (thisType == "prompt") {
-      // targetDiv.html("<p>prompt ]</p></div>", true);
-      thishtml += "<p>prompt ]</p></div>";
-    }
+      })
+      thishtml += "</div>";
+    } else {
+      thishtml = "<div>"
+      lines.forEach((thisline, i) => { 
+        if (thisline) thishtml += "<p>"+thisline+"</p>";
+      })
+      thishtml += "</div>"
+    };
     if (thishtml) targetDiv.html(thishtml, true);
   };
 }

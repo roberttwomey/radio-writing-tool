@@ -1,5 +1,6 @@
 // HTTP Portion
 var http = require('http');
+
 // Path module
 var path = require('path');
 
@@ -8,9 +9,18 @@ var fs = require('fs');
 
 require('dotenv').config();
 
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
+// as imports
+// import http from 'http';
+// import path from 'path';
+// import fs from 'fs';
+// import dotenv from 'dotenv';
+// dotenv.config();
+
+// import OpenAI from 'openai';
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
 });
 
 var server = http.createServer(handleRequest);
@@ -20,9 +30,11 @@ console.log('--== Server started on port 8080 ==--');
 // var io = require('socket.io').listen(server);
 
 const io = require('socket.io')(server)
+
+// import { Server } from "socket.io";
+// const io = new Server(server)
+
 console.log('--== socket.io listening on server ==--');
-
-
 
 function handleRequest(req, res) {
   // What did we request?
@@ -83,7 +95,7 @@ io.sockets.on('connection', (socket) => {
 
 // ======== OpenAI Stuff =========
 
-const openai = new OpenAIApi(configuration);
+// const openai = new OpenAIApi(configuration);
 let gpt_prefs = {};
 let verbose = false;
 
@@ -117,10 +129,19 @@ function promptGPT3(thisprompt, socket) {
 
     console.log(`prompt: ${prompt.slice(0, 64)}...`);
           // console.log(`prompt: ${gpt_args['prompt']}`);
-    const gptResponse = await openai.createCompletion(gpt_args);
+    // const gptResponse = await openai.createCompletion(gpt_args);
 
-    completion = gptResponse.data.choices[0].text;
-    console.log(`completion: ${completion.slice(0, 64)}...`);
+    // new ChatCompletions https://github.com/openai/openai-node#usage
+    const gptResponse = await openai.chat.completions.create({
+      messages: [{ role: 'user', content: gpt_args['prompt'] }],
+      model: gpt_args['model'],
+    });
+
+    console.log(gptResponse);
+
+    completion = gptResponse.choices[0].message.content;
+    // console.log(`completion: ${completion.slice(0, 64)}...`);
+    console.log(`completion: ${completion}...`);
 
     let response = prompt + completion;
 
