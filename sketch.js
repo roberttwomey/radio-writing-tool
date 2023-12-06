@@ -5,11 +5,9 @@
 // Speech Object
 //let speechRec;
 
-
-
 let socket;
 
-let gridState = 0;
+let gridState = 1;
 
 let gridSizes = [
   [ "1 / 3", "3 / 5", "5 / 7", "3 / 5"],
@@ -42,6 +40,9 @@ function setup() {
   
   speechRec.addEventListener('end', () => startListening());
   speechRec.start(true, true);
+  
+  // don't listen by default
+  toggleListening();
   // speechRec.start(true, true);
 
   // // Create a Speech Recognition object with callback
@@ -143,7 +144,6 @@ function copyTo(thisClass) {
   lastSelected = "";
 }
 
-
 function toggleSpeaking(thisClass) {
   // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
   let thissymbol = document.getElementsByClassName("speaking")[0];
@@ -162,6 +162,7 @@ function toggleListening() {
   if (bListening) {
     stopListening()
   } else {
+    bListening = true;
     startListening();
   }
 }
@@ -176,53 +177,55 @@ function stopListening() {
 }
 
 function startListening() {
-  console.log("listening on");
-  let thissymbol = document.getElementsByClassName("listening")[0];
-  thissymbol.innerHTML = '<i class="myfa fa fa-microphone"></i>';
-  bListening = true;
-  speechRec.start(true, true);
+  if(bListening) {
+    console.log("listening on");
+    let thissymbol = document.getElementsByClassName("listening")[0];
+    thissymbol.innerHTML = '<i class="myfa fa fa-microphone"></i>';
+    // bListening = true;
+    speechRec.start(true, true);
+  }
 }
 
 // adjusting size of panes
 
-function toggleState(thisClass) {
-  if (thisClass == "box1") {
-    if (gridState == 1) {
-      gridState = 0;
-    } else {
-      gridState = 1
-    }
-  } else if (thisClass == "box2") {
-    if (gridState == 2) {
-      gridState = 0;
-    } else {
-      gridState = 2;
-    }    
-  } else if (thisClass == "box3") {
-    if (gridState == 3) {
-      gridState = 0;
-    } else {
-      gridState = 3;
-    }    
-  }
-  updateGridState();
-}
+// function toggleState(thisClass) {
+//   if (thisClass == "box1") {
+//     if (gridState == 1) {
+//       gridState = 0;
+//     } else {
+//       gridState = 1
+//     }
+//   } else if (thisClass == "box2") {
+//     if (gridState == 2) {
+//       gridState = 0;
+//     } else {
+//       gridState = 2;
+//     }    
+//   } else if (thisClass == "box3") {
+//     if (gridState == 3) {
+//       gridState = 0;
+//     } else {
+//       gridState = 3;
+//     }    
+//   }
+//   updateGridState();
+// }
 
-function updateGridState() {
+// function updateGridState() {
 
-  thisbox = document.getElementsByClassName("box1")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][0];
+//   thisbox = document.getElementsByClassName("box1")[0];
+//   thisbox.style.gridColumn = gridSizes[gridState][0];
   
-  thisbox = document.getElementsByClassName("box2")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][1];
+//   thisbox = document.getElementsByClassName("box2")[0];
+//   thisbox.style.gridColumn = gridSizes[gridState][1];
   
-  thisbox = document.getElementsByClassName("box3")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][2];
+//   thisbox = document.getElementsByClassName("box3")[0];
+//   thisbox.style.gridColumn = gridSizes[gridState][2];
 
-  thisbox = document.getElementsByClassName("box4")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][3];
+//   thisbox = document.getElementsByClassName("box4")[0];
+//   thisbox.style.gridColumn = gridSizes[gridState][3];
   
-}
+// }
 
 
 // select and copy text

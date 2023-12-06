@@ -1,0 +1,7 @@
+{
+    "ubik": {
+        "type": "gen",
+        "prompt": "choose one type of product: home or beauty or auto or office or lifestyle or fashion or health.\\n write a short advertisement for that product, called Ubik. three sentences long."
+    },
+    
+}

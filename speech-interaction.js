@@ -23,6 +23,7 @@ var SpeechRecognitionEvent =
   SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
 
 var speechRec = new SpeechRecognition();
+speechRec.interimResults = true;
 
 speechRec.onresult = (event) => {
   // DOM element to display results
@@ -56,7 +57,7 @@ speechRec.onresult = (event) => {
     // temp result: display in light gray
     let tempspeechoutput = lastHtml + "<p style='color: gray'>" + said + "</p>";
     speechoutput.innerHTML = tempspeechoutput;
-    speechoutput.style.color = "gray";
+    // speechoutput.style.color = "gray";
   }
 };
 
