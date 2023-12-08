@@ -9,7 +9,17 @@
         {
             "id": "text1",
             "type": "text",
-            "text": "INT. RUNICTER ASSOCIATES OFFICE - DAY\n\nJoe Chip sits at his desk, waiting. Ahead of him, the door opens and Patricia Conley enters, smoldering and brooding.\n\nJOE CHIP\n(referring to Patricia)\nYou made good time, Mrs. Jackson. You had less time than anybody else.\n\nPATRICIA CONLEY\n(sand-colored lady)\nSome of you I know.\n\nGLEN RUNICTER\n(rising from his chair)\nPlease find a seat and make yourselves comfortable.\n\nEveryone finds a seat, settling in and getting ready for the meeting.\n\nGLEN RUNICTER\n(indicating Patricia)\nYou, Miss Dorn, Mr. Chip, and I chose you first because of your work with S. Dole Melipone.\n\nEDIE DORN\n(wispy and shy)\nThank you, Mr. Runciter. It's good to be a part of this new undertaking.\n\nGLEN RUNICTER\n(looking at his documents)\nWhich one of you is Al Hammond?\n\nAL HAMMOND\n(points to himself)\nI'm Al Hammond.\n\nGLEN RUNICTER\n(reading Al Hammond's file)\nYou rate highest among our anti-precogs. How many of the rest of you are anti-precog?\n\nThree people raise their hands.\n\nGLEN RUNICTER\n(to the group)\nThe four of you will get a great bloop out of meeting and working with G. G. Ashwood's most recent discovery. Miss Conley, would you describe it to us?\n\nPatricia is about to respond when suddenly, Glen Runciter finds himself standing in front of a shop window on Fifth Avenue.\n\nGLEN RUNICTER\n(startled)\nWhat am I doing here? And how long have I been wandering around window-shopping when I should be in my office?\n\nHe tries to remember but realizes that his memory is failing him.\n\nGLEN RUNICTER\n(dazed)\nEverything I built up... it's gone.\n"
+            "text": "INT. RUNICTER ASSOCIATES OFFICE - DAY\n\nJoe Chip sits at his desk, waiting. Ahead of him, the door opens and Patricia Conley enters, smoldering and brooding.\n\nJOE CHIP\n(referring to Patricia)\nYou made good time, Mrs. Jackson. You had less time than anybody else.\n\nPATRICIA CONLEY\n(sand-colored lady)\nSome of you I know.\n\nGLEN RUNICTER\n(rising from his chair)\nPlease find a seat and make yourselves comfortable.\n\nEveryone finds a seat, settling in and getting ready for the meeting.\n\nGLEN RUNICTER\n(indicating Patricia)\nYou, Miss Dorn, Mr. Chip, and I chose you first because of your work with S. Dole Melipone.\n\nEDIE DORN\n(wispy and shy)\nThank you, Mr. Runciter. It's good to be a part of this new undertaking.\n\nGLEN RUNICTER\n(looking at his documents)\nWhich one of you is Al Hammond?\n\nAL HAMMOND\n(points to himself)\nI'm Al Hammond.\n\nGLEN RUNICTER\n(reading Al Hammond's file)\nYou rate highest among our anti-precogs. How many of the rest of you are anti-precog?\n\nThree people raise their hands.\n\nGLEN RUNICTER\n(to the group)\nThe four of you will get a great bloop out of meeting and working with G. G. Ashwood's most recent discovery. Miss Conley, would you describe it to us?\n\nPatricia is about to respond when suddenly, Glen Runciter finds himself standing in front of a shop window on Fifth Avenue.\n\n"
+        },
+        {
+            "id": "gen2",
+            "type": "prompt",
+            "text": "write one paragraph about a character named Glen interacting with a smart home that is reluctant to let him in the front door."
+        },
+        {
+            "id": "text2",
+            "type": "text",
+            "text": "GLEN RUNICTER\n(startled)\nWhat am I doing here? And how long have I been wandering around window-shopping when I should be in my office?\n\nHe tries to remember but realizes that his memory is failing him.\n\nGLEN RUNICTER\n(dazed)\nEverything I built up... it's gone.\n"
         },
         {
             "id": "text2",

@@ -21,6 +21,7 @@ let lastSelected = "";
 let bSpeaking = true;
 let bListening = true;
 let script;
+let lastGenId;
 
 function preload() {
   script = loadJSON("ubik-demo.json");
@@ -39,7 +40,7 @@ function setup() {
     console.log("received completion: "+completion);
     let targetDiv = select("#completion");
     targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
-    let scriptTargetDiv = select("#gen1");
+    let scriptTargetDiv = select("#"+lastGenId);
     scriptTargetDiv.html("<p contenteditable='true'>"+completion+"</p>")
   })
 
@@ -102,7 +103,7 @@ function parseScript(script) {
   let targetDiv = select("#script");
 
   targetDiv.html("");
-  
+
   // iterate over lines if we are dealing with a multi-line selection
   
   for (let i=0; i<data.paragraphs.length; i++) {
@@ -115,7 +116,7 @@ function parseScript(script) {
     let thishtml = "";
     if (thisType == "prompt") {
       // targetDiv.html("<div style='color: green'><p>prompt [</p>", true);
-      thishtml = "<div style='color: green' id=\""+thisId+"\">";
+      thishtml = "<div style='color: green; background-color: lime' id=\""+thisId+"\">";
       lines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
@@ -131,9 +132,32 @@ function parseScript(script) {
   };
 }
 
+document.addEventListener('click', function(event) {
+    let targetElement = event.target; // Get the clicked element
+
+    // Traverse up the DOM tree until a div is found or the root is reached
+    while (targetElement && targetElement.nodeName !== 'DIV') {
+        targetElement = targetElement.parentNode;
+    }
+
+    if (targetElement) {
+        // Do something with the div element
+        console.log('Clicked inside DIV with id:', targetElement.id);
+        for(let i = 0; i < script.paragraphs.length; i++) {
+          thisPara = script.paragraphs[i];
+          if (thisPara.id == targetElement.id && thisPara.type == "prompt") {
+            lastSelected = targetElement.innerHTML;
+            lastGenId = thisPara.id;
+            copyTo("box2"); // we are copying this text to the prompt box
+          }
+        }
+    } else {
+        console.log('Clicked outside any DIV');
+    }
+});
+
 
 // do completion
-
 function doCompletion() {
   // let promptDiv = select("#prompt");
   let promptDiv = document.getElementById("prompt");
