@@ -23,7 +23,10 @@ OPENAI_API_KEY=XXXXXX
 
 ### Node setup
 
-Install node.js
+Install node.js with homebrew
+```
+brew install node
+```
 
 Install node packages:
 ```
@@ -40,10 +43,9 @@ node writing-server.js
 
 *Visit in Browser*
 
-open `localhost:8080` in Safari (speechRec isn't working in edge)
+open `localhost:8080` in Safari (speechRec doesn't work in edge)
 
 <img width="800" alt="browser view of app with three columns" src="https://github.com/roberttwomey/radio-writing-tool/assets/1598545/cca785e4-cf63-4efc-a529-e0c34f678498">
-
 
 ### Running with pm2
 
