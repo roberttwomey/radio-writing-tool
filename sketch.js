@@ -151,9 +151,21 @@ function scriptToJSON() {
     jsonOut.paragraphs.push(thisChunk);
   }
   console.log("requesting save on server");
-  socket.emit('save', JSON.stringify(jsonOut, null, 4));
+  let jsonString = JSON.stringify(jsonOut, null, 4);
+  socket.emit('save', jsonString);
+  
+  return jsonString;
 }
 
+function downloadJSON(content) {
+  let contentType = "text/plain";
+  let fileName = "script.json";
+  let a = document.createElement("a");
+  let file = new Blob([content], {type: contentType});
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  a.click();
+}
 
 document.addEventListener('click', function(event) {
     let targetElement = event.target; // Get the clicked element
@@ -264,7 +276,7 @@ function copyPromptTo(thisClass) {
   target = "#prompt";
   
   // console.log("copy \""+lastPrompt+"\" to "+target);
-  
+
   let targetDiv = select(target);
   targetDiv.html(lastPrompt);
 
@@ -335,7 +347,8 @@ document.addEventListener('keydown', function(event) {
     if (event.key === 'z') {
       alert('Undo!');
     } else if (event.key === 's') {
-      scriptToJSON();
+      thisScript = scriptToJSON();
+      downloadJSON(thisScript);
     }
     // } else if (event.key === 'g') {
     //   if (lastDiv) {
