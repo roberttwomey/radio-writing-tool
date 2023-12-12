@@ -17,14 +17,18 @@ let gridSizes = [
   ];
 
 let lastSelected = "";
+let lastPrompt = "";
+let lastDiv;
 
 let bSpeaking = true;
 let bListening = true;
-let script;
+let bNewCompletion = false;
+
+let scriptJSON;
 let lastGenId;
 
 function preload() {
-  script = loadJSON("ubik-demo.json");
+  scriptJSON = loadJSON("ubik-demo.json");
 }
 
 function setup() {
@@ -38,10 +42,26 @@ function setup() {
     // console.log("received completion: "+data);
     let completion = data["completion"]
     console.log("received completion: "+completion);
+
+    // update completion box
     let targetDiv = select("#completion");
     targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
+    
+    // update this generated div in script box
     let scriptTargetDiv = select("#"+lastGenId);
-    scriptTargetDiv.html("<p contenteditable='true'>"+completion+"</p>")
+    thishtml = "<p contenteditable='true'>"+completion+"</p>";
+    
+    // store prompt in tooltip again
+    let promptDiv = select("#prompt");
+    let lastPrompt = promptDiv.elt.innerHTML;
+    console.log("adding tooltip");
+    thishtml +="<span class='tooltiptext'>";
+    const lines = lastPrompt.split(/\r?\n/);
+    lines.forEach((thisline, i) => {   
+      if (thisline) thishtml += thisline+"<br>";
+    });
+    thishtml += "</span>"
+    scriptTargetDiv.html(thishtml);
   })
 
   document.addEventListener('selectionchange', () => updateSelection());
@@ -49,55 +69,15 @@ function setup() {
   speechRec.addEventListener('end', () => startListening());
   speechRec.start(true, true);
   
-  // don't listen by default
+  // don't listen by default, don't speak by default
   toggleListening();
   toggleSpeaking();
 
-  parseScript(script);
-  // speechRec.start(true, true);
-
-  // // Create a Speech Recognition object with callback
-  // speechRec = new p5.SpeechRec("en-US", gotSpeech);
-  // // "Continuous recognition" (as opposed to one time only)
-  // let continuous = true;
-  // // If you want to try partial recognition (faster, less accurate)
-  // let interimResults = true;
-
-  // // // This must come after setting the properties
-  // speechRec.start(continuous, interimResults);
-
-  // // DOM element to display results
-  // let output = select("#speech");
-
-  // let lastHtml = "";
-  // let count = 0;
-
-  // console.log("listening...");
-  // // Speech recognized event
-  // function gotSpeech() {
-  //   // Something is there
-  //   // Get it as a string, you can also get JSON with more info
-  //   console.log(speechRec);
-
-  //   if (speechRec.resultValue) {
-  //     let said = speechRec.resultString;
-  //     if (speechRec.resultJSON.results[count].isFinal) {
-  //       // final, add to html
-  //       let newHtml = lastHtml + "<p>" + said + "</p>";
-  //       output.html(newHtml);
-  //       lastHtml = newHtml;
-  //       count += 1;
-  //     } else {
-  //       // temp, add in light gray
-  //       let tempOutput = lastHtml + "<p style='color: gray'>" + said + '</p>';
-  //       output.html(tempOutput);
-  //     }
-  //   }
-  // }
+  jsonToScript(scriptJSON);
 }
 
-function parseScript(script) {
-  data = script;
+function jsonToScript(scriptJSON) {
+  data = scriptJSON;
   console.log(data);
 
   let targetDiv = select("#script");
@@ -116,13 +96,20 @@ function parseScript(script) {
     let thishtml = "";
     if (thisType == "prompt") {
       // targetDiv.html("<div style='color: green'><p>prompt [</p>", true);
-      thishtml = "<div style='color: green; background-color: lime' id=\""+thisId+"\">";
+      thishtml = "<div id=\""+thisId+"\" class=\"tooltip "+thisType+"\">";
+      // add prompt as text, in paragraphs
       lines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
+      // add prompt as tooltip, in a tooltip span
+      thishtml += "<span class='tooltiptext'>"
+      lines.forEach((thisline, i) => {   
+        if (thisline) thishtml += thisline+"<br>";
+      })
+      thishtml += "</span>"
       thishtml += "</div>";
     } else {
-      thishtml = "<div>"
+      thishtml = "<div id=\""+thisId+"\" class=\""+thisType+"\">"
       lines.forEach((thisline, i) => { 
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
@@ -131,6 +118,40 @@ function parseScript(script) {
     if (thishtml) targetDiv.html(thishtml, true);
   };
 }
+
+function scriptToJSON() {
+  let jsonOut = {};
+  jsonOut.paragraphs = [];
+
+  var childDivs = document.getElementById('script').getElementsByTagName('div');
+  for( i=0; i< childDivs.length; i++ )
+  {
+    var thisDiv = childDivs[i];    
+    
+    let thisChunk = {};
+
+    thisChunk.id = thisDiv.id;
+
+    thisChunk.type = "text";
+    if (thisDiv.classList.contains("prompt")) {
+      thisChunk.type = "prompt";
+      let thisPrompt = thisDiv.querySelector('.tooltiptext').innerHTML;
+      // .getElementsByTagName('p')[0];
+      console.log(thisPrompt);
+      thisChunk.prompt = thisPrompt;
+    } else if (thisDiv.classList.contains("text")) {
+      thisChunk.type = "text";
+    }
+
+    thisChunk.text = thisDiv.innerText;
+
+    // console.log(thisChunk);
+    jsonOut.paragraphs.push(thisChunk);
+  }
+  console.log("requesting save on server");
+  socket.emit('save', JSON.stringify(jsonOut));
+}
+
 
 document.addEventListener('click', function(event) {
     let targetElement = event.target; // Get the clicked element
@@ -143,14 +164,22 @@ document.addEventListener('click', function(event) {
     if (targetElement) {
         // Do something with the div element
         console.log('Clicked inside DIV with id:', targetElement.id);
-        for(let i = 0; i < script.paragraphs.length; i++) {
-          thisPara = script.paragraphs[i];
+        for(let i = 0; i < scriptJSON.paragraphs.length; i++) {
+          thisPara = scriptJSON.paragraphs[i];
           if (thisPara.id == targetElement.id && thisPara.type == "prompt") {
-            lastSelected = targetElement.innerHTML;
+            // lastSelected = targetElement.innerHTML;
+            lastPrompt = ""
+            document.getElementById(targetElement.id).querySelectorAll('span').forEach(element => {
+              lastPrompt+=element.innerHTML;
+            })
             lastGenId = thisPara.id;
-            copyTo("box2"); // we are copying this text to the prompt box
+            copyPromptTo("box2"); // we are copying this text to the prompt box
+
+            // do the prompting
+            doCompletion();
           }
         }
+        lastDiv = targetElement;
     } else {
         console.log('Clicked outside any DIV');
     }
@@ -159,17 +188,10 @@ document.addEventListener('click', function(event) {
 
 // do completion
 function doCompletion() {
-  // let promptDiv = select("#prompt");
   let promptDiv = document.getElementById("prompt");
   
-  // let completion = select("#completion");
-  // completion.html("<p>"+prompt.html()+"</p>", true);
-
-  // let prompt = promptDiv.html();
-
   // convert paragraph elements <p> to lines with newlines
   let paragraphs = Array.from(promptDiv.getElementsByTagName("p"));
-  // console.log(paragraphs);
 
   let prompt = ""
   for(let i = 0; i < paragraphs.length; i++) {
@@ -182,10 +204,9 @@ function doCompletion() {
     prompt: prompt
   }
   
-  // prompt the server with the data
+  // prompt the server with the data over the websocket
+  // return will be handled by callback
   socket.emit('prompt', data);
-
-  // promptGPT3(prompt.html().toString());
 }
 
 function copyTo(thisClass) {
@@ -208,15 +229,44 @@ function copyTo(thisClass) {
   // iterate over lines if we are dealing with a multi-line selection
   const lines = lastSelected.split(/\r?\n/);
   console.log(lines);
-  if (target == "#prompt") targetDiv.html("")
+  thishtml = targetDiv.innerHTML;
+  if (target == "#prompt") thishtml = "";
+
+  if (target == "#script" && bNewCompletion == true) {
+    thishtml +="<span class='tooltiptext>";
+    lines.forEach((thisline, i) => {   
+      if (thisline) thishtml += thisline+"<br>";
+    })
+    thishtml += "</span>"
+    bNewCompletion = false;
+  }
+
   lines.forEach((thisline, i) => {
-    if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+    if (thisline) thishtml+="<p>"+thisline+"</p>";
   });
 
+  targetDiv.html(thishtml);
   // targetDiv.html("<p>"+lastSelected+"</p>", true);
   
   lastSelected = "";
 }
+
+function copyPromptTo(thisClass) {
+  target = "#prompt";
+  
+  console.log("copy \""+lastPrompt+"\" to "+target);
+  let targetDiv = select(target);
+
+  // iterate over lines if we are dealing with a multi-line selection
+  const lines = lastPrompt.split(/\r?\n/);
+  console.log(lines);
+  if (target == "#prompt") targetDiv.html("")
+  lines.forEach((thisline, i) => {
+    if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+    // if (thisline) targetDiv.html(thisline, true)
+  });
+}
+
 
 function toggleSpeaking(thisClass) {
   // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
@@ -301,15 +351,45 @@ function startListening() {
   
 // }
 
-
-// select and copy text
-
 function updateSelection() {
-  // let thisText = document.getSelection().toString();
   let thisText = document.getSelection().toString()
-  console.log(thisText);
+  // console.log(thisText);
   if (thisText != "") {
     // console.log("last selected: "+thisText);
     lastSelected = thisText;  
   }
 }
+
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey) {
+    if (event.key === 'z') {
+      alert('Undo!');
+    } else if (event.key === 's') {
+      scriptToJSON();
+    }
+    // } else if (event.key === 'g') {
+    //   if (lastDiv) {
+    //     if (lastDiv.classList.contains('prompt')) {
+    //       console.log("setting "+lastDiv.id+" to be text");
+    //       lastDiv.classList.remove("prompt");
+    //       lastDiv.classList.add("text");
+    //     } else {
+    //       console.log("setting "+lastDiv.id+" to be generative");
+    //       lastDiv.classList.remove("text");
+    //       lastDiv.classList.add("prompt");
+    //       lastGenId = lastDiv.id;
+    //     }
+    //   }
+    // } else if (event.key === 'e') {
+    //   if (lastDiv) {
+    //     if (lastDiv.contentEditable) {
+    //       console.log("setting "+lastDiv.id+" to not be editable...");
+    //       lastDiv.contentEditable = false;
+    //     } else {
+    //       console.log("setting "+lastDiv.id+" to be editable...");
+    //       lastDiv.contentEditable = true;
+    //     }
+    //   }
+    // }
+  }
+});
