@@ -17,6 +17,7 @@ let bNewCompletion = false;
 
 let scriptJSON;
 let lastGenId;
+let prompts = {};
 
 function preload() {
   scriptJSON = loadJSON("ubik-demo.json");
@@ -27,33 +28,47 @@ function setup() {
   
   // Start the socket connection for gpt3 server completion
   socket = io.connect('http://localhost:8080')
+  //socket = io.connect('http://54.219.126.173:8080');
+  // socket = io.connect('http://app.radio-play.net:8080');
 
   // Callback function
   socket.on('completion', data => {
     // console.log("received completion: "+data);
-    let completion = data["completion"]
+    let completion = data["completion"];
+    let targetId = data["id"];
+    // console.log(data["id"])
+    // console.log(targetId);
+
+    // get prompt corresponding to this target
+    let lastPrompt = prompts[targetId];
+
     console.log("received completion: "+completion);
 
     // update completion box
     let targetDiv = select("#completion");
-    targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
+    let thishtml = ""
+    const lines = completion.split(/\r?\n/);
+    lines.forEach((thisline, i) => {   
+      if (thisline) thishtml += "<p contenteditable='true'>"+thisline+"</p>";
+    })
+
+    targetDiv.html(thishtml, true);
+    // targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
     
     // update this generated div in script box
-    let scriptTargetDiv = select("#"+lastGenId);
-    thishtml = "<p contenteditable='true'>"+completion+"</p>";
+    let scriptTargetDiv = select("#"+targetId);
+    // thishtml = "<p contenteditable='true'>"+completion+"</p>";
     
     // store prompt in tooltip again
-    let promptDiv = select("#prompt");
-    let lastPrompt = promptDiv.elt.innerHTML;
     console.log("adding tooltip");
-    thishtml +="<span class='tooltiptext'>";
-    const lines = lastPrompt.split(/\r?\n/);
-    lines.forEach((thisline, i) => {   
-      // if (thisline) thishtml += thisline+"<br>";
-      if (thisline) thishtml += '<p>'+thisline+'</p>';
-    });
-    thishtml += "</span>"
+    thishtml +="<span class='tooltiptext'>"+lastPrompt+"</span>";
+    
     scriptTargetDiv.html(thishtml);
+
+    // console.log(prompts);
+    // console.log("removing prompt from prompts... "+targetId)
+    // delete prompts.targetId;
+    // console.log(prompts)
   })
 
   document.addEventListener('selectionchange', () => updateSelection());
@@ -66,7 +81,7 @@ function setup() {
   toggleSpeaking();
 
   jsonToScript(scriptJSON);
-
+    
   // // fine upload
   // input = document.getElementById("fileInput");
   // input.addEventListener("change", handleFiles, false);
@@ -188,15 +203,22 @@ document.addEventListener('click', function(event) {
             // lastSelected = targetElement.innerHTML;
             lastPrompt = "" 
             document.getElementById(targetElement.id).querySelectorAll('span').forEach(element => {
-              let lines = element.innerHTML.split('<br>');
-              // console.log(lines);
-              lines.forEach((line) => { if (line.length>0) lastPrompt+='<p>'+line+'</p>'});
+              // let lines = element.innerHTML.split('<br>');
+              // let lines = Array.from(element.getElementsByTagName("p"));
+              let lines = element.children;
+              console.log(lines);
+
+              for (j = 0; j < lines.length; j++) {
+                lastPrompt += '<p>'+lines[j].innerText+'</p>';
+              }
+              // lines.forEach((line) => { if (line.length>0) lastPrompt+='<p>'+line.innerText+'</p>'});
               // lastPrompt+=element.innerHTML;
             })
             lastGenId = thisPara.id;
+            prompts[lastGenId] = lastPrompt;
 
              // we are copying this text to the prompt box
-            copyPromptTo("box2");
+            copyPromptToBox();
 
             // do the prompting
             doCompletion();
@@ -223,10 +245,11 @@ function doCompletion() {
     prompt+=paragraphs[i].innerText+"\n";
   }
 
-  console.log("prompting: "+prompt);
+  console.log("prompting: "+prompt+ " for  " + lastGenId);
 
   const promptData = {
-    prompt: prompt
+    prompt: prompt,
+    id: lastGenId
   }
   
   // prompt the server with the data over the websocket
@@ -276,7 +299,7 @@ function copyTo(thisClass) {
   lastSelected = "";
 }
 
-function copyPromptTo(thisClass) {
+function copyPromptToBox() {
   target = "#prompt";
   
   // console.log("copy \""+lastPrompt+"\" to "+target);

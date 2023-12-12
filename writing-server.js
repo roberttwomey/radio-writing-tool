@@ -98,9 +98,11 @@ io.sockets.on('connection', (socket) => {
     socket.on('prompt',(data) => {
       // Data comes in as whatever was sent, including objects
       let prompt = data["prompt"];
-      console.log("received prompt: " + prompt);
+      let targetId = data["id"];
 
-      promptGPT3(prompt, socket)
+      console.log("received prompt: " + prompt + " for " + targetId);
+
+      promptGPT3(prompt, targetId, socket)
 
     });
 
@@ -127,14 +129,14 @@ io.sockets.on('connection', (socket) => {
 let gpt_prefs = {};
 let verbose = false;
 
-console.log('--== GPT-3 Bot Ready ==--');
+console.log('--== GPT Bot Ready ==--');
 
 let prompt = ``;
 
 
-function promptGPT3(thisprompt, socket) {
+function promptGPT3(thisprompt, targetId, socket) {
 
-  console.log(`~ this is a new prompt: ${thisprompt}`);
+  console.log(`~ this is a new prompt: ${thisprompt} on ${socket}`);
 
   let prompt = thisprompt;
 
@@ -182,12 +184,13 @@ function promptGPT3(thisprompt, socket) {
     //       // console.log(response.length)
 
     const result = {
-      completion: completion
+      completion: completion,
+      id: targetId
     }
 
     // Send it to all other clients
     socket.emit('completion', result);
-    console.log("emitted completion: ", result);
+    console.log("emitted completion: ", result, "on "+  socket);
 
   })();
 

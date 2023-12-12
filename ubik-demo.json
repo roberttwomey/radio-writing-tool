@@ -1,6 +1,17 @@
 { 
     "paragraphs": [
         {
+            "id": "gen0",
+            "type": "prompt",
+            "prompt": "write a title for an AI generated script adaptation of Philip K. Dick's book Ubik. do not use the word Ubik. do not use quotation marks.\n",
+            "text": "write a title for an AI generated script adaptation of Philip K. Dick's book Ubik. do not use the word Ubik. do not use quotation marks.\n"
+        },
+        {
+            "id": "text0",
+            "type": "text",
+            "text": "SCRIPT\n\n<i>(Intro, Ubik Advertisement)</i>"
+        },
+        {
             "id": "gen1",
             "type": "prompt",
             "text": "choose one type of product: home or beauty or auto or office or lifestyle or fashion or health.\nwrite a short advertisement for that product, called Ubik. three sentences long."
@@ -14,7 +25,7 @@
         {
             "id": "gen2",
             "type": "prompt",
-            "text": "write one paragraph about a character named Glen interacting with a smart home that is reluctant to let him in the front door."
+            "text": "choose one type of smart device: coffee maker, door, shower, newspaper, videophone.\nwrite four lines of spoken dialog between JOE CHIP and that coin-operated smart device. It is reluctant to serve him because he has no money. format as a screenplay. four lines of dialog maximum."
         },
         {
             "id": "text2",
