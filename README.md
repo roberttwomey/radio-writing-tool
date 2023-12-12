@@ -24,12 +24,19 @@ OPENAI_API_KEY=XXXXXX
 ### Node setup
 
 Install node.js
+```
+sudo apt update
+sudo apt install nodejs
+sudo apt install npm
+```
 
 Install node packages:
 ```
 npm install http-server -g
 npm install pm2 -g
 npm install -g express
+npm install -g dotenv
+npm install -g openai
 ```
 
 ## Usage
