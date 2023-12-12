@@ -25,7 +25,7 @@
         {
             "id": "gen2",
             "type": "prompt",
-            "text": "choose one type of smart device: coffee maker, door, shower, newspaper, videophone.\nwrite four lines of spoken dialog between JOE CHIP and that coin-operated smart device. It is reluctant to serve him because he has no money. format as a screenplay. four lines of dialog maximum."
+            "text": "choose one device between the door or shower or newspaper or telephone or doorbell or radio. write four lines of spoken dialog between JOE CHIP and an automatic, coin-operated version of that device. It is reluctant to serve him because he has no money. format as a screenplay. four lines of dialog maximum."
         },
         {
             "id": "text2",

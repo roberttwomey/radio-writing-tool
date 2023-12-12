@@ -114,20 +114,38 @@ function jsonToScript(scriptJSON) {
       })
       // add prompt as tooltip, in a tooltip span
       thishtml += "<span class='tooltiptext'>"
+      lastPrompt = ""
       lines.forEach((thisline, i) => {   
         // if (thisline) thishtml += thisline+"<br>";
-        if (thisline) thishtml += '<p>'+thisline+'</p>';
+        if (thisline) {
+          thishtml += '<p>'+thisline+'</p>';
+          lastPrompt += '<p>'+thisline+'</p>';
+        }
       })
       thishtml += "</span>"
       thishtml += "</div>";
+
+      // add html to page
+      targetDiv.html(thishtml, true);
+
+      // prompt it
+      lastGenId = thisId;
+      prompts[lastGenId] = lastPrompt;
+
+       // we are copying this text to the prompt box
+      copyPromptToBox();
+
+      // do the completion
+      doCompletion()
+
     } else {
       thishtml = "<div id=\""+thisId+"\" class=\""+thisType+"\">"
       lines.forEach((thisline, i) => { 
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
       thishtml += "</div>"
+      if (thishtml) targetDiv.html(thishtml, true);
     };
-    if (thishtml) targetDiv.html(thishtml, true);
   };
 }
 
