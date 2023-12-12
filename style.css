@@ -86,7 +86,7 @@ p {
   grid-column: 5 / 7;
   /* grid-column-stop: 7; */
   grid-row-start: 1;
-  grid-row-end: 3;
+  grid-row-end: 2;
 /*   overflow: auto; */
 }
 
@@ -102,7 +102,7 @@ p {
 
 .box4 {
   grid-column: 5 / 7;
-  grid-row-start: 3;
+  grid-row-start: 2;
   grid-row-end: 5;
   overflow: auto;
 /*    resize: horizontal;
@@ -140,7 +140,7 @@ p {
 .tooltip .tooltiptext {
   visibility: hidden;
   color: green; 
-  background-color: lightgray;
+  background-color: lime;
   /* width: 120px;
   background-color: black;
   color: #fff;
@@ -149,8 +149,27 @@ p {
   padding: 5px 0; */
 
   /* Position the tooltip */
+  /* position: absolute;
+  z-index: 1; */
+  /* top: 5px;
+  left: 5px;
+  margin: 10 10px; */
+
+  /* from chat gpt */
+  /* width: 120px; */
+  border-radius: 6px;
   position: absolute;
   z-index: 1;
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  width: calc(100% - 20px);
+  max-height: calc(100% - 20px);  /* margin-left: -60px; Adjust as needed */
+  /* padding: 10px; */
+  /* margin: 10px; */
+  box-sizing: border-box; /* Ensures padding is included in the width */
+    
 }
 
 /* [contenteditable="true"] {
@@ -163,5 +182,5 @@ p {
 
 .prompt {
   color: green; 
-  background-color: lime;
+  background-color: lightgreen;
 }

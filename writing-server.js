@@ -95,6 +95,15 @@ io.sockets.on('connection', (socket) => {
       // Data comes in as whatever was sent, including objects
       console.log("received script as json: " + data);
       // save to local filesystem
+
+      let outfile = "ubik-demo-new.json"
+      fs.writeFile(outfile, data, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log("scene was saved as "+outfile+" ("+data.length+" bytes)");
+    }); 
+
     });
   }
 );

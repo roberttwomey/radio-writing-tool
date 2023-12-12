@@ -37,6 +37,7 @@ npm install pm2 -g
 npm install -g express
 npm install -g dotenv
 npm install -g openai
+npm install socket.io
 ```
 
 ## Usage

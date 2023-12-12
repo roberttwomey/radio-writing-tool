@@ -7,15 +7,6 @@
 
 let socket;
 
-let gridState = 1;
-
-let gridSizes = [
-  [ "1 / 3", "3 / 5", "5 / 7", "3 / 5"],
-  [ "1 / 5", "5 / 6", "6 / 7", "5 / 6"],
-  [ "1 / 2", "2 / 6", "6 / 7", "2 / 6"],
-  [ "1 / 2", "2 / 3", "3 / 7", "2 / 3"],
-  ];
-
 let lastSelected = "";
 let lastPrompt = "";
 let lastDiv;
@@ -58,7 +49,8 @@ function setup() {
     thishtml +="<span class='tooltiptext'>";
     const lines = lastPrompt.split(/\r?\n/);
     lines.forEach((thisline, i) => {   
-      if (thisline) thishtml += thisline+"<br>";
+      // if (thisline) thishtml += thisline+"<br>";
+      if (thisline) thishtml += '<p>'+thisline+'</p>';
     });
     thishtml += "</span>"
     scriptTargetDiv.html(thishtml);
@@ -104,7 +96,8 @@ function jsonToScript(scriptJSON) {
       // add prompt as tooltip, in a tooltip span
       thishtml += "<span class='tooltiptext'>"
       lines.forEach((thisline, i) => {   
-        if (thisline) thishtml += thisline+"<br>";
+        // if (thisline) thishtml += thisline+"<br>";
+        if (thisline) thishtml += '<p>'+thisline+'</p>';
       })
       thishtml += "</span>"
       thishtml += "</div>";
@@ -133,11 +126,20 @@ function scriptToJSON() {
     thisChunk.id = thisDiv.id;
 
     thisChunk.type = "text";
+
     if (thisDiv.classList.contains("prompt")) {
       thisChunk.type = "prompt";
-      let thisPrompt = thisDiv.querySelector('.tooltiptext').innerHTML;
-      // .getElementsByTagName('p')[0];
-      console.log(thisPrompt);
+    
+      let thisPrompt = ""
+      
+      // assume paragraphs are the only children
+      var paragraphs = thisDiv.querySelector('.tooltiptext').children;
+      
+      // loop over paragraphs
+      for (j = 0; j < paragraphs.length; j++) {
+        let thisPara = paragraphs[j];
+        thisPrompt += thisPara.innerHTML+'/n';
+      }
       thisChunk.prompt = thisPrompt;
     } else if (thisDiv.classList.contains("text")) {
       thisChunk.type = "text";
@@ -149,7 +151,7 @@ function scriptToJSON() {
     jsonOut.paragraphs.push(thisChunk);
   }
   console.log("requesting save on server");
-  socket.emit('save', JSON.stringify(jsonOut));
+  socket.emit('save', JSON.stringify(jsonOut, null, 4));
 }
 
 
@@ -168,12 +170,17 @@ document.addEventListener('click', function(event) {
           thisPara = scriptJSON.paragraphs[i];
           if (thisPara.id == targetElement.id && thisPara.type == "prompt") {
             // lastSelected = targetElement.innerHTML;
-            lastPrompt = ""
+            lastPrompt = "" 
             document.getElementById(targetElement.id).querySelectorAll('span').forEach(element => {
-              lastPrompt+=element.innerHTML;
+              let lines = element.innerHTML.split('<br>');
+              // console.log(lines);
+              lines.forEach((line) => { if (line.length>0) lastPrompt+='<p>'+line+'</p>'});
+              // lastPrompt+=element.innerHTML;
             })
             lastGenId = thisPara.id;
-            copyPromptTo("box2"); // we are copying this text to the prompt box
+
+             // we are copying this text to the prompt box
+            copyPromptTo("box2");
 
             // do the prompting
             doCompletion();
@@ -190,23 +197,25 @@ document.addEventListener('click', function(event) {
 function doCompletion() {
   let promptDiv = document.getElementById("prompt");
   
-  // convert paragraph elements <p> to lines with newlines
+  // get the list of paragraphs in our prompt window
   let paragraphs = Array.from(promptDiv.getElementsByTagName("p"));
 
   let prompt = ""
   for(let i = 0; i < paragraphs.length; i++) {
     // console.log("paragraphs "+i+" "+paragraphs[i].innerText) // Will print the content of each paragraph
+    // prompt+=paragraphs[i].innerText+"\n"; // ADDED /n twice
     prompt+=paragraphs[i].innerText+"\n";
   }
 
   console.log("prompting: "+prompt);
-  const data = {
+
+  const promptData = {
     prompt: prompt
   }
   
   // prompt the server with the data over the websocket
   // return will be handled by callback
-  socket.emit('prompt', data);
+  socket.emit('prompt', promptData);
 }
 
 function copyTo(thisClass) {
@@ -254,17 +263,19 @@ function copyTo(thisClass) {
 function copyPromptTo(thisClass) {
   target = "#prompt";
   
-  console.log("copy \""+lastPrompt+"\" to "+target);
+  // console.log("copy \""+lastPrompt+"\" to "+target);
+  
   let targetDiv = select(target);
+  targetDiv.html(lastPrompt);
 
-  // iterate over lines if we are dealing with a multi-line selection
-  const lines = lastPrompt.split(/\r?\n/);
-  console.log(lines);
-  if (target == "#prompt") targetDiv.html("")
-  lines.forEach((thisline, i) => {
-    if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
-    // if (thisline) targetDiv.html(thisline, true)
-  });
+  // // iterate over lines if we are dealing with a multi-line selection
+  // const lines = lastPrompt.split(/\r?\n/);
+  // console.log(lines);
+  // if (target == "#prompt") targetDiv.html("")
+  // lines.forEach((thisline, i) => {
+  //   if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+  //   // if (thisline) targetDiv.html(thisline, true)
+  // });
 }
 
 
@@ -309,47 +320,6 @@ function startListening() {
     speechRec.start(true, true);
   }
 }
-
-// adjusting size of panes
-
-// function toggleState(thisClass) {
-//   if (thisClass == "box1") {
-//     if (gridState == 1) {
-//       gridState = 0;
-//     } else {
-//       gridState = 1
-//     }
-//   } else if (thisClass == "box2") {
-//     if (gridState == 2) {
-//       gridState = 0;
-//     } else {
-//       gridState = 2;
-//     }    
-//   } else if (thisClass == "box3") {
-//     if (gridState == 3) {
-//       gridState = 0;
-//     } else {
-//       gridState = 3;
-//     }    
-//   }
-//   updateGridState();
-// }
-
-// function updateGridState() {
-
-//   thisbox = document.getElementsByClassName("box1")[0];
-//   thisbox.style.gridColumn = gridSizes[gridState][0];
-  
-//   thisbox = document.getElementsByClassName("box2")[0];
-//   thisbox.style.gridColumn = gridSizes[gridState][1];
-  
-//   thisbox = document.getElementsByClassName("box3")[0];
-//   thisbox.style.gridColumn = gridSizes[gridState][2];
-
-//   thisbox = document.getElementsByClassName("box4")[0];
-//   thisbox.style.gridColumn = gridSizes[gridState][3];
-  
-// }
 
 function updateSelection() {
   let thisText = document.getSelection().toString()
