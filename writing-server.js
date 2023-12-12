@@ -7,6 +7,19 @@ var path = require('path');
 // Using the filesystem module
 var fs = require('fs');
 
+// // file uploads with multer
+// const multer = require('multer');
+
+// // Configure multer for file storage
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'uploads/') // Destination folder
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, file.fieldname + '-' + Date.now())
+//     }
+// });
+
 require('dotenv').config();
 
 // as imports
@@ -43,7 +56,12 @@ function handleRequest(req, res) {
   // If blank let's ask for index.html
   if (pathname == '/') {
     pathname = '/index.html';
+  } else if (pathname == '/upload') {
+    // do upload
+
+    break;
   }
+
   
   // Ok what's our file extension
   var ext = path.extname(pathname);

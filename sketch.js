@@ -66,6 +66,10 @@ function setup() {
   toggleSpeaking();
 
   jsonToScript(scriptJSON);
+
+  // // fine upload
+  // input = document.getElementById("fileInput");
+  // input.addEventListener("change", handleFiles, false);
 }
 
 function jsonToScript(scriptJSON) {
@@ -376,3 +380,78 @@ document.addEventListener('keydown', function(event) {
     // }
   }
 });
+
+// // file upload code from ChatGPT4
+// document.getElementById('uploadButton').addEventListener('click', function() {
+//   var fileInput = document.getElementById('fileInput');
+//   var file = fileInput.files[0];
+//   var formData = new FormData();
+//   formData.append('file', file);
+
+//   fetch('/upload', {
+//       method: 'POST',
+//       body: formData
+//   })
+//   .then(response => response.json())
+//   .then(data => console.log(data))
+//   .catch(error => console.error('Error:', error));
+// });
+
+// from here https://editor.p5js.org/amcc/sketches/_pnyek8kr
+
+document.getElementById('fileInput').addEventListener('change', function(event) {
+  var file = event.target.files[0];
+  if (!file) {
+      return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+      var contents = e.target.result;
+      try {
+          var json = JSON.parse(contents);
+          console.log('JSON file content:', json);
+          scriptJSON = json;
+          jsonToScript(scriptJSON);
+      } catch (e) {
+          console.error('Error parsing JSON:', e);
+      }
+  };
+
+  reader.onerror = function() {
+      console.error('Error reading file:', reader.error);
+  };
+
+  reader.readAsText(file);
+});
+
+document.getElementById('downloadButton').addEventListener('click', function(event) {
+  thisScript = scriptToJSON();
+  downloadJSON(thisScript);
+});
+
+// function handleFiles() {
+//   const fileList = this.files; /* now you can work with the file list */
+//   const file = fileList[0]
+//   console.log(file)
+
+//   var reader = new FileReader();
+
+//   const blob = new Blob([file], {type:"application/json"});
+
+//   reader.onload = function(e) {
+//     // if (file.type === 'image/png' || file.type === 'image/jpeg') {
+//     //   img = createImg(e.target.result, '');
+//     //   img.hide();
+//     // } else {
+//     //   img = null;
+//     // }
+//     if (file.type === '"application/json') {
+//       console.log(e.target.result, JSON.parse(reader.result));
+//     }
+//   }
+
+//   // reader.readAsDataURL(file);
+//   reader.readAsText(blob);
+
+// }
