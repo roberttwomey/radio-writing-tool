@@ -56,12 +56,7 @@ function handleRequest(req, res) {
   // If blank let's ask for index.html
   if (pathname == '/') {
     pathname = '/index.html';
-  } else if (pathname == '/upload') {
-    // do upload
-
-    break;
   }
-
   
   // Ok what's our file extension
   var ext = path.extname(pathname);
