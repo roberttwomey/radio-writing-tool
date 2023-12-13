@@ -256,19 +256,23 @@ function doCompletion() {
   // get the list of paragraphs in our prompt window
   let paragraphs = Array.from(promptDiv.getElementsByTagName("p"));
 
-  let prompt = ""
+  let promptHtml = "";
+  let gptprompt = "";
   for(let i = 0; i < paragraphs.length; i++) {
     // console.log("paragraphs "+i+" "+paragraphs[i].innerText) // Will print the content of each paragraph
     // prompt+=paragraphs[i].innerText+"\n"; // ADDED /n twice
-    prompt+=paragraphs[i].innerText+"\n";
+    gptprompt+=paragraphs[i].innerText+"\n";
+    promptHtml+="<p>"+paragraphs[i].innerText+"</p>";
   }
 
-  console.log("prompting: "+prompt+ " for  " + lastGenId);
+  console.log("prompting: "+gptprompt+ " for  " + lastGenId);
 
   const promptData = {
-    prompt: prompt,
+    prompt: gptprompt,
     id: lastGenId
   }
+
+  prompts[lastGenId] = promptHtml;
   
   // prompt the server with the data over the websocket
   // return will be handled by callback
