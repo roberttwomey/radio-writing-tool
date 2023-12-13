@@ -3,13 +3,12 @@
         {
             "id": "gen0",
             "type": "prompt",
-            "prompt": "write a title for an AI generated script adaptation of Philip K. Dick's book Ubik. do not use the word Ubik. do not use quotation marks.\n",
             "text": "write a title for an AI generated script adaptation of Philip K. Dick's book Ubik. do not use the word Ubik. do not use quotation marks.\n"
         },
         {
             "id": "text0",
             "type": "text",
-            "text": "SCRIPT\n\n<i>(Intro, Ubik Advertisement)</i>"
+            "text": "========\n\nINTRO ADVERTISEMENT\n"
         },
         {
             "id": "gen1",
@@ -25,7 +24,7 @@
         {
             "id": "gen2",
             "type": "prompt",
-            "text": "choose one device between the door or shower or newspaper or telephone or doorbell or radio. write four lines of spoken dialog between JOE CHIP and an automatic, coin-operated version of that device. It is reluctant to serve him because he has no money. format as a screenplay. four lines of dialog maximum."
+            "text": "choose one device between the door or shower or newspaper or telephone or doorbell or radio. write four lines of spoken dialog between JOE CHIP and an automatic, coin-operated version of that device. this exchange occurs in JOE's apartment. the device is reluctant to serve him because he has no money. format as a screenplay. four lines of dialog maximum."
         },
         {
             "id": "text2",

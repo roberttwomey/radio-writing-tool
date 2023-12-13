@@ -16,11 +16,13 @@
   </head>
   <body>
     <main>
+      <div class="instructions">
       <p>USAGE: Click on <span style="color: green; background-color: lightgreen;">a passage in green</span> 
         to generate a new response. Hover your mouse over generated text to see the prompt. 
         CTRL-S to download your script as json, if you prefer to edit it that way. 
         You can also upload using the buttons at bottom.
         Reload the page to restart</p>
+      </div>
       <div class="wrapper">
         <div class="box box1">
           <h1>
@@ -79,7 +81,9 @@
           </div>
         </div>
       </div>
+      <div class="buttons">
       <button id="downloadButton">Download Script as JSON</button> <input type="file" id="fileInput" accept=".json">
+    </div>
     </main>
     <script src="sketch.js"></script>
     <script src="speech-interaction.js"></script>

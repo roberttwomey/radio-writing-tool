@@ -60,9 +60,17 @@ p {
   background-color: #E0E0E0;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  height: 100vh;
+  height: 85vh;
+  /* height: calc(100% - 100px); */
 }
 
+.instructions {
+  height: 11vh;
+}
+
+.buttons {
+  height: 4vh;
+}
 
 .box {
   border: 2px solid #a0a0a0;
