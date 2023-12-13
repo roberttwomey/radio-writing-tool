@@ -129,7 +129,7 @@ function jsonToWebpage(scriptJSON) {
     thisChunk = data.paragraphs[i].text;
     const textLines = thisChunk.split(/\r?\n/);
     
-    // console.log(lines);
+    console.log(textLines);
     let thishtml = "";
     if (thisType == "prompt") {
       thisPrompt = data.paragraphs[i].prompt;
@@ -202,7 +202,7 @@ function scriptToJSON() {
       // loop over paragraphs
       for (j = 0; j < paragraphs.length; j++) {
         let thisPara = paragraphs[j];
-        thisPrompt += thisPara.innerHTML+'/n';
+        thisPrompt += thisPara.innerHTML+'\n';
       }
       thisChunk.prompt = thisPrompt;
     } else if (thisDiv.classList.contains("text")) {
@@ -284,7 +284,7 @@ function doCompletion() {
   let gptprompt = "";
   for(let i = 0; i < paragraphs.length; i++) {
     // console.log("paragraphs "+i+" "+paragraphs[i].innerText) // Will print the content of each paragraph
-    // prompt+=paragraphs[i].innerText+"\n"; // ADDED /n twice
+    // prompt+=paragraphs[i].innerText+"\n"; // ADDED \n twice
     gptprompt+=paragraphs[i].innerText+"\n";
     promptHtml+="<p>"+paragraphs[i].innerText+"</p>";
   }
