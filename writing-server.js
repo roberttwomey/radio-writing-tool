@@ -24,6 +24,20 @@ const io = require('socket.io')(server)
 
 console.log('--== socket.io listening on server ==--');
 
+function saveScriptJSON(data) {
+  let outfile = "ubik-demo-new.json"
+  fs.writeFile(outfile, data, function(err) {
+    if(err) {
+        return console.log(err);
+    }
+    console.log("scene was saved as "+outfile+" ("+data.length+" bytes)");
+  }); 
+}
+
+let scriptJSON = fs.readFileSync("ubik-demo.json", "utf-8");
+
+// console.log(scriptJSON);
+
 function handleRequest(req, res) {
   // What did we request?
   var pathname = req.url;
@@ -83,18 +97,45 @@ io.sockets.on('connection', (socket) => {
 
     socket.on('save',(data) => {
       // Data comes in as whatever was sent, including objects
-      console.log("received script as json: " + data);
+      console.log("received script as json: " + data.slice(0, 32));
       // save to local filesystem
 
       let outfile = "ubik-demo-new.json"
       fs.writeFile(outfile, data, function(err) {
-        if(err) {
-            return console.log(err);
-        }
-        console.log("scene was saved as "+outfile+" ("+data.length+" bytes)");
-    }); 
+          if(err) {
+              return console.log(err);
+          }
+          console.log("scene was saved as "+outfile+" ("+data.length+" bytes)");
+      }); 
 
     });
+
+    socket.on('update',(data) => {
+      // Data comes in as whatever was sent, including objects
+      console.log("received updates from " + socket.id);
+    
+      // update script in memory from update
+      scriptJSON = data;
+
+      let json = JSON.parse(data);
+      // store script locally
+      saveScriptJSON(data);
+
+      // broadcast updated script to all clients
+      socket.broadcast.emit('script', data);
+      console.log("broadcast updated script to all clients")
+    });
+
+    socket.on('script',(data) => {
+      // requested script
+      console.log(socket.id+" requested script");
+      
+      // broadcast updated script to requesting client
+      // console.log(scriptJSON);
+      socket.emit('script', scriptJSON);
+      console.log("broadcast updated script requesting client")
+    });
+
   }
 );
 
@@ -145,7 +186,7 @@ function promptGPT3(thisprompt, targetId, socket) {
 
     completion = gptResponse.choices[0].message.content;
     // console.log(`completion: ${completion.slice(0, 64)}...`);
-    console.log(`completion: ${completion}...`);
+    console.log(`completion: ${completion.slice(0, 32)}...`);
 
     let response = prompt + completion;
 
@@ -164,7 +205,7 @@ function promptGPT3(thisprompt, targetId, socket) {
 
     // Send it to all other clients
     socket.emit('completion', result);
-    console.log("emitted completion: ", result, "on "+  socket);
+    console.log("emitted completion: ", result.toString().slice(0, 32), "on "+  socket);
 
   })();
 

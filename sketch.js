@@ -32,14 +32,23 @@ function setup() {
   //socket = io.connect('http://54.219.126.173:8080');
   // socket = io.connect('http://app.radio-play.net:8080');
 
+  socket.on('script', data => {
+    var json = JSON.parse(data);
+    // json = data;
+    console.log('JSON file content:', json);
+    scriptJSON = json;
+    console.log("received new script from server", data.slice(0, 32));
+    // console.log(json.slice(0, 32));
+    // console.log(scriptJSON);
+    jsonToWebpage(json);
+  });
+
   // Callback function
   socket.on('completion', data => {
     // console.log("received completion: "+data);
     let completion = data["completion"];
     let targetId = data["id"];
-    // console.log(data["id"])
-    // console.log(targetId);
-
+    
     // get prompt corresponding to this target
     let lastPrompt = prompts[targetId];
 
@@ -74,6 +83,7 @@ function setup() {
     // delete prompts.targetId;
     // console.log(prompts)
     if (bBroadcasting) {
+      console.log("sending script to server.");
       sendScriptToServer();
     }
   })
@@ -87,49 +97,53 @@ function setup() {
   toggleListening();
   toggleSpeaking();
 
-  jsonToScript(scriptJSON);
-    
-  // // fine upload
-  // input = document.getElementById("fileInput");
-  // input.addEventListener("change", handleFiles, false);
+  jsonToWebpage(scriptJSON);    
   requestScriptSocket();
 }
 
 function requestScriptSocket() {
   // request script from server over the websocket
-  // return will be handled by callback
   socket.emit('script', 0);
 }
 
-function jsonToScript(scriptJSON) {
-  data = scriptJSON;
-  console.log(data);
+function sendScriptToServer() {
+  // send script to server
+  scriptJSON = scriptToJSON();
+  let jsonString = JSON.stringify(scriptJSON, null, 4);
+  socket.emit('update', jsonString);
+}
+
+function jsonToWebpage(scriptJSON) {
+  let data = scriptJSON;
+  // console.log("script json", data.paragraphs[0]);
 
   let targetDiv = select("#script");
 
   targetDiv.html("");
 
   // iterate over lines if we are dealing with a multi-line selection
-  
   for (let i=0; i<data.paragraphs.length; i++) {
     // console.log(data.paragraphs[i]);
     thisId = data.paragraphs[i].id;
     thisType = data.paragraphs[i].type;
     thisChunk = data.paragraphs[i].text;
-    const lines = thisChunk.split(/\r?\n/);
+    const textLines = thisChunk.split(/\r?\n/);
+    
     // console.log(lines);
     let thishtml = "";
     if (thisType == "prompt") {
-      // targetDiv.html("<div style='color: green'><p>prompt [</p>", true);
+      thisPrompt = data.paragraphs[i].prompt;
+      const promptLines = thisPrompt.split(/\r?\n/);
       thishtml = "<div id=\""+thisId+"\" class=\"tooltip "+thisType+"\">";
+      
       // add prompt as text, in paragraphs
-      lines.forEach((thisline, i) => {   
+      textLines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
       // add prompt as tooltip, in a tooltip span
       thishtml += "<span class='tooltiptext'>"
       lastPrompt = ""
-      lines.forEach((thisline, i) => {   
+      promptLines.forEach((thisline, i) => {   
         // if (thisline) thishtml += thisline+"<br>";
         if (thisline) {
           thishtml += '<p>'+thisline+'</p>';
@@ -147,14 +161,13 @@ function jsonToScript(scriptJSON) {
       prompts[lastGenId] = lastPrompt;
 
        // we are copying this text to the prompt box
-      copyPromptToBox();
+      // copyPromptToBox();
 
       // do the completion
-      doCompletion()
-
+      // doCompletion()
     } else {
       thishtml = "<div id=\""+thisId+"\" class=\""+thisType+"\">"
-      lines.forEach((thisline, i) => { 
+      textLines.forEach((thisline, i) => { 
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
       thishtml += "</div>"
@@ -201,11 +214,8 @@ function scriptToJSON() {
     // console.log(thisChunk);
     jsonOut.paragraphs.push(thisChunk);
   }
-  console.log("requesting save on server");
-  let jsonString = JSON.stringify(jsonOut, null, 4);
-  socket.emit('save', jsonString);
   
-  return jsonString;
+  return jsonOut;
 }
 
 function downloadJSON(content) {
@@ -238,7 +248,7 @@ document.addEventListener('click', function(event) {
               // let lines = element.innerHTML.split('<br>');
               // let lines = Array.from(element.getElementsByTagName("p"));
               let lines = element.children;
-              console.log(lines);
+              // console.log(lines);
 
               for (j = 0; j < lines.length; j++) {
                 lastPrompt += '<p>'+lines[j].innerText+'</p>';
@@ -485,7 +495,7 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
           var json = JSON.parse(contents);
           console.log('JSON file content:', json);
           scriptJSON = json;
-          jsonToScript(scriptJSON);
+          jsonToWebpage(scriptJSON);
       } catch (e) {
           console.error('Error parsing JSON:', e);
       }
