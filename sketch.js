@@ -14,6 +14,7 @@ let lastDiv;
 let bSpeaking = true;
 let bListening = true;
 let bNewCompletion = false;
+let bBroadcasting = false;
 
 let scriptJSON;
 let lastGenId;
@@ -72,6 +73,9 @@ function setup() {
     // console.log("removing prompt from prompts... "+targetId)
     // delete prompts.targetId;
     // console.log(prompts)
+    if (bBroadcasting) {
+      sendScriptToServer();
+    }
   })
 
   document.addEventListener('selectionchange', () => updateSelection());
@@ -345,7 +349,7 @@ function copyPromptToBox() {
 function toggleBroadcast(thisClass) {
   // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
   let thissymbol = document.getElementsByClassName("broadcast")[0];
-  if (bSpeaking) {
+  if (bBroadcasting) {
     console.log("broadcast off");
     thissymbol.innerHTML = '<i class="myfa fa fa-toggle-off"></i>';
     bBroadcasting = false;

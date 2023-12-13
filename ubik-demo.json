@@ -49,7 +49,12 @@
         {
             "id": "genedit",
             "type": "prompt",
-            "text": "Write one paragraph of stage direction where PAT CONWAY re-edits reality. Conclude the passage with \nRETURN TO BEGINNING"
+            "text": "Write one paragraph of stage direction where PAT CONLEY from the Philip K Dick book Ubik re-edits reality."
+        },
+        {
+            "id": "loop",
+            "type": "text",
+            "text": "RETURN TO BEGINNING"
         }
     ]
 }
