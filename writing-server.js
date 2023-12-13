@@ -7,27 +7,7 @@ var path = require('path');
 // Using the filesystem module
 var fs = require('fs');
 
-// // file uploads with multer
-// const multer = require('multer');
-
-// // Configure multer for file storage
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, 'uploads/') // Destination folder
-//     },
-//     filename: function (req, file, cb) {
-//         cb(null, file.fieldname + '-' + Date.now())
-//     }
-// });
-
 require('dotenv').config();
-
-// as imports
-// import http from 'http';
-// import path from 'path';
-// import fs from 'fs';
-// import dotenv from 'dotenv';
-// dotenv.config();
 
 // import OpenAI from 'openai';
 const OpenAI = require('openai');
@@ -40,12 +20,7 @@ var server = http.createServer(handleRequest);
 server.listen(8080);
 console.log('--== Server started on port 8080 ==--');
 
-// var io = require('socket.io').listen(server);
-
 const io = require('socket.io')(server)
-
-// import { Server } from "socket.io";
-// const io = new Server(server)
 
 console.log('--== socket.io listening on server ==--');
 
@@ -125,14 +100,12 @@ io.sockets.on('connection', (socket) => {
 
 // ======== OpenAI Stuff =========
 
-// const openai = new OpenAIApi(configuration);
 let gpt_prefs = {};
 let verbose = false;
 
 console.log('--== GPT Bot Ready ==--');
 
 let prompt = ``;
-
 
 function promptGPT3(thisprompt, targetId, socket) {
 
@@ -143,6 +116,7 @@ function promptGPT3(thisprompt, targetId, socket) {
   const gpt_args = {
     // model: "text-davinci-002",
     model: "gpt-3.5-turbo",
+    // model: "gpt-3.5-turbo-instruct",
     prompt: prompt,
     max_tokens: 256,
     temperature: 0.7,

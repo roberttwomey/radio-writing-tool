@@ -42,7 +42,7 @@ function setup() {
     // get prompt corresponding to this target
     let lastPrompt = prompts[targetId];
 
-    console.log("received completion: "+completion);
+    console.log("received completion: "+completion.slice(0, 32));
 
     // update completion box
     let targetDiv = select("#completion");
@@ -51,8 +51,11 @@ function setup() {
     lines.forEach((thisline, i) => {   
       if (thisline) thishtml += "<p contenteditable='true'>"+thisline+"</p>";
     })
-
+    // console.log(targetDiv);
+    // let oldHtml = targetDiv.textContent;
+    // targetDiv.html(oldHtml+thishtml);
     targetDiv.html(thishtml, true);
+
     // targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
     
     // update this generated div in script box
@@ -60,7 +63,7 @@ function setup() {
     // thishtml = "<p contenteditable='true'>"+completion+"</p>";
     
     // store prompt in tooltip again
-    console.log("adding tooltip");
+    // console.log("adding tooltip");
     thishtml +="<span class='tooltiptext'>"+lastPrompt+"</span>";
     
     scriptTargetDiv.html(thishtml);
@@ -239,7 +242,7 @@ document.addEventListener('click', function(event) {
             copyPromptToBox();
 
             // do the prompting
-            doCompletion();
+            // doCompletion();
           }
         }
         lastDiv = targetElement;
@@ -265,7 +268,7 @@ function doCompletion() {
     promptHtml+="<p>"+paragraphs[i].innerText+"</p>";
   }
 
-  console.log("prompting: "+gptprompt+ " for  " + lastGenId);
+  console.log("prompting: "+gptprompt.slice(0, 32)+ " for  " + lastGenId);
 
   const promptData = {
     prompt: gptprompt,
@@ -337,6 +340,20 @@ function copyPromptToBox() {
   //   if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
   //   // if (thisline) targetDiv.html(thisline, true)
   // });
+}
+
+function toggleBroadcast(thisClass) {
+  // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
+  let thissymbol = document.getElementsByClassName("broadcast")[0];
+  if (bSpeaking) {
+    console.log("broadcast off");
+    thissymbol.innerHTML = '<i class="myfa fa fa-toggle-off"></i>';
+    bBroadcasting = false;
+  } else {
+    console.log("broadcast on");
+    thissymbol.innerHTML = '<i class="myfa fa fa-toggle-on"></i>';
+    bBroadcasting = true;
+  }
 }
 
 

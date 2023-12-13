@@ -29,10 +29,11 @@
             <div class="alignleft unselectable" onclick="copyTo('box1');">
               Script
             </div>
+            
             <!-- <div class="alignright" onclick="toggleState('box1');">
               &#x2194;
             </div> -->
-            <div class="alignright speaking" onclick="toggleSpeaking();">
+            <div class="alignright speaking" style="visibility: hidden" onclick="toggleSpeaking();">
               <i class="myfa fa fa-toggle-on"></i>
             </div>
             <div style="clear: both;"></div>
@@ -45,6 +46,9 @@
           <h1>
             <div class="alignleft unselectable" onclick="copyTo('box2');">
               Prompt
+            </div>
+            <div class="alignright completion" onclick="doCompletion();">
+              <i class="myfa fa fa-play"></i>
             </div>
             <!-- <div class="alignright" onclick="toggleState('box2');">
               &#x2194;
@@ -73,9 +77,9 @@
           </div>
         </div>
         <div class="box box4">
-          <div class="unselectable">
-            <h1 onclick="doCompletion();">Completion</h1>
-          </div>
+          <!-- <div class="alightleft unselectable">
+            <h1>Completion</h1>
+          </div> -->
           <div id="completion" contenteditable="true">
             <p></p>
           </div>
@@ -83,6 +87,10 @@
       </div>
       <div class="buttons">
       <button id="downloadButton">Download Script as JSON</button> <input type="file" id="fileInput" accept=".json">
+      <!-- <button id="broadcastButton" class="alightright">Broadcast</button> -->
+      <div class="alignright broadcast" onclick="toggleBroadcast();">
+        Broadcast <i class="myfa fa fa-toggle-off"></i>
+      </div>
     </div>
     </main>
     <script src="sketch.js"></script>

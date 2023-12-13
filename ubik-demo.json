@@ -17,24 +17,39 @@
 
         },
         {
-            "id": "text1",
+            "id": "interiorapt",
             "type": "text",
-            "text": "INT. RUNICTER ASSOCIATES OFFICE - DAY\n\nJoe Chip sits at his desk, waiting. Ahead of him, the door opens and Patricia Conley enters, smoldering and brooding.\n\nJOE CHIP\n(referring to Patricia)\nYou made good time, Mrs. Jackson. You had less time than anybody else.\n\nPATRICIA CONLEY\n(sand-colored lady)\nSome of you I know.\n\nGLEN RUNICTER\n(rising from his chair)\nPlease find a seat and make yourselves comfortable.\n\nEveryone finds a seat, settling in and getting ready for the meeting.\n\nGLEN RUNICTER\n(indicating Patricia)\nYou, Miss Dorn, Mr. Chip, and I chose you first because of your work with S. Dole Melipone.\n\nEDIE DORN\n(wispy and shy)\nThank you, Mr. Runciter. It's good to be a part of this new undertaking.\n\nGLEN RUNICTER\n(looking at his documents)\nWhich one of you is Al Hammond?\n\nAL HAMMOND\n(points to himself)\nI'm Al Hammond.\n\nGLEN RUNICTER\n(reading Al Hammond's file)\nYou rate highest among our anti-precogs. How many of the rest of you are anti-precog?\n\nThree people raise their hands.\n\nGLEN RUNICTER\n(to the group)\nThe four of you will get a great bloop out of meeting and working with G. G. Ashwood's most recent discovery. Miss Conley, would you describe it to us?\n\nPatricia is about to respond when suddenly, Glen Runciter finds himself standing in front of a shop window on Fifth Avenue.\n\n"
+            "text": " "
         },
         {
-            "id": "gen2",
+            "id": "genapt",
             "type": "prompt",
-            "text": "choose one device between the door or shower or newspaper or telephone or doorbell or radio. write four lines of spoken dialog between JOE CHIP and an automatic, coin-operated version of that device. this exchange occurs in JOE's apartment. the device is reluctant to serve him because he has no money. format as a screenplay. four lines of dialog maximum."
+            "text": "Write a short description of an apartment from a Philip K Dick novel. It is owned by JOE CHIP, and is packed with automatic, coin-operated appliances. Ironically, JOE has no money to use his own space. Write this in the form of a screenplay, one paragraph max.\n\nBegin the paragraph with INT. RETRO-FUTURISTIC APARTMENT - DAY"
         },
         {
-            "id": "text2",
-            "type": "text",
-            "text": "GLEN RUNICTER\n(startled)\nWhat am I doing here? And how long have I been wandering around window-shopping when I should be in my office?\n\nHe tries to remember but realizes that his memory is failing him.\n\nGLEN RUNICTER\n(dazed)\nEverything I built up... it's gone.\n"
+            "id": "genobjects",
+            "type": "prompt",
+            "text": "choose three small items from a household junk drawer, and rewrite the following sentence using objects: \n\nSound of doorbell; we see CHIP stumble up, spilling several small objects from his lap. Voice of G.G. ASHWOOD on the other side of the door"  
         },
         {
-            "id": "text3",
+            "id": "opendoor",
             "type": "text",
-            "text": "some dialog with runciter"
+            "text": "ASHWOOD\nI know it's early Joe, but I just hit town. I've got a firm prospect I snared in Topeka. I read this one as magnificent and I want your confirmation.\nJOE CHIP\nI don't have any test equipment in the apt. It's an anti-what? Anti-telepath?\nASHWOOD\nI'll lay it right on you upfront, Joe, I don't know. This is confidential, this one.\nJOE CHIP\nOkay! Give me five minutes to get dressed and find out if I've got any coffee around the apt.\nASHWOOD\nYou'll like her.\nJOE CHIP\nPardon? (displays panic) My apt's unfit to be seen; I'm behind in my payments to the building clean-up robots. They haven't wheeled in here in two weeks. (Pauses, with mixed emotions) How old is she?"
+        },
+        {
+            "id": "gendoor",
+            "type": "prompt",
+            "text": "write four lines of spoken dialog between JOE CHIP and an automatic, coin-operated front door. JOE is trying to get the door to open so his guests can enter. The device is reluctant to open the door because he has no money. Ultimately he convinces the door to let them in. Format as a screenplay with four lines of dialog maximum."
+        },
+        {
+            "id": "opendoor",
+            "type": "text",
+            "text": "[JOE, PAT, and ASHWOOD MEET]"
+        },
+        {
+            "id": "genedit",
+            "type": "prompt",
+            "text": "Write one paragraph of stage direction where PAT CONWAY re-edits reality. Conclude the passage with \nRETURN TO BEGINNING"
         }
     ]
 }
