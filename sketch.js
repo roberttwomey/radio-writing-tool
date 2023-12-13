@@ -92,6 +92,13 @@ function setup() {
   // // fine upload
   // input = document.getElementById("fileInput");
   // input.addEventListener("change", handleFiles, false);
+  requestScriptSocket();
+}
+
+function requestScriptSocket() {
+  // request script from server over the websocket
+  // return will be handled by callback
+  socket.emit('script', 0);
 }
 
 function jsonToScript(scriptJSON) {
