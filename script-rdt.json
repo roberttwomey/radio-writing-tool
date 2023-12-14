@@ -1,0 +1,42 @@
+{
+    "paragraphs": [
+        {
+            "id": "gen0",
+            "type": "prompt",
+            "prompt": "write a title for an AI generated script adaptation of Philip K. Dick's book Ubik. do not use the word Ubik. do not use quotation marks.\n",
+            "text": "write a title for an AI generated script adaptation of Philip K. Dick's book Ubik. do not use the word Ubik. do not use quotation marks.\n"
+        },
+        {
+            "id": "text0",
+            "type": "text",
+            "text": "SCRIPT\n\n<i>Intro, Ubik Advertisement</i>"
+        },
+        {
+            "id": "gen1",
+            "type": "prompt",
+            "prompt": "choose one type of product: home or beauty or auto or office or lifestyle or fashion or health.\nwrite a short advertisement for that product, called Ubik. three sentences long.\n",
+            "text": "choose one type of product: home or beauty or auto or office or lifestyle or fashion or health.\n\nwrite a short advertisement for that product, called Ubik. three sentences long. do not use the word Introducing."
+        },
+        {
+            "id": "text1",
+            "type": "text",
+            "text": "INT. RUNICTER ASSOCIATES OFFICE - DAY\n\nJoe Chip sits at his desk, waiting. Ahead of him, the door opens and Patricia Conley enters, smoldering and brooding.\n\nJOE CHIP\n\n(referring to Patricia)\n\nYou made good time, Mrs. Jackson. You had less time than anybody else.\n\nPATRICIA CONLEY\n\n(sand-colored lady)\n\nSome of you I know.\n\nGLEN RUNICTER\n\n(rising from his chair)\n\nPlease find a seat and make yourselves comfortable.\n\nEveryone finds a seat, settling in and getting ready for the meeting.\n\nGLEN RUNICTER\n\n(indicating Patricia)\n\nYou, Miss Dorn, Mr. Chip, and I chose you first because of your work with S. Dole Melipone.\n\nEDIE DORN\n\n(wispy and shy)\n\nThank you, Mr. Runciter. It's good to be a part of this new undertaking.\n\nGLEN RUNICTER\n\n(looking at his documents)\n\nWhich one of you is Al Hammond?\n\nAL HAMMOND\n\n(points to himself)\n\nI'm Al Hammond.\n\nGLEN RUNICTER\n\n(reading Al Hammond's file)\n\nYou rate highest among our anti-precogs. How many of the rest of you are anti-precog?\n\nThree people raise their hands.\n\nGLEN RUNICTER\n\n(to the group)\n\nThe four of you will get a great bloop out of meeting and working with G. G. Ashwood's most recent discovery. Miss Conley, would you describe it to us?\n\nPatricia is about to respond when suddenly, Glen Runciter finds himself standing in front of a shop window on Fifth Avenue.\n\n"
+        },
+        {
+            "id": "gen2",
+            "type": "prompt",
+            "prompt": "write one paragraph about a character named Glen interacting with a smart home that is reluctant to let him in the front door.\n",
+            "text": "write one paragraph about a character named Glen interacting with a smart home that is reluctant to let him in the front door.\n\n\n"
+        },
+        {
+            "id": "text2",
+            "type": "text",
+            "text": "GLEN RUNICTER\n\n(startled)\n\nWhat am I doing here? And how long have I been wandering around window-shopping when I should be in my office?\n\nHe tries to remember but realizes that his memory is failing him.\n\nGLEN RUNICTER\n\n(dazed)\n\nEverything I built up... it's gone.\n\n"
+        },
+        {
+            "id": "text3",
+            "type": "text",
+            "text": "some dialog with runciter\n\n"
+        }
+    ]
+}

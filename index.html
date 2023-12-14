@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Radio Writing Tool</title>
+    <title>AI Performance Interface // TLP</title>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
@@ -16,22 +16,30 @@
   </head>
   <body>
     <main>
+      <div class="instructions">
+      <p>USAGE: Double click on <span style="color: green; background-color: lightgreen;">a passage in green</span> 
+        to generate a new response. Hover your mouse over green text to see the prompt. 
+        CTRL-S to download your script as json, if you prefer to edit it that way. 
+        You can then use the upload button to upload it. Reload the page to restart.
+      Click "Broadcast" to transmit your results to other clients.</p>
+      </div>
       <div class="wrapper">
         <div class="box box1">
           <h1>
             <div class="alignleft unselectable" onclick="copyTo('box1');">
-              Performance Script
+              Script
             </div>
+            
             <!-- <div class="alignright" onclick="toggleState('box1');">
               &#x2194;
             </div> -->
-            <div class="alignright speaking" onclick="toggleSpeaking();">
+            <div class="alignright speaking" style="visibility: hidden" onclick="toggleSpeaking();">
               <i class="myfa fa fa-toggle-on"></i>
             </div>
             <div style="clear: both;"></div>
           </h1>
           <div id="script" contenteditable="true">
-            <p>SPEAKER 1: Lorem ipsem test test.</p>
+            <p>[Script goes here]</p>
           </div>
         </div>
         <div class="box box2">
@@ -39,41 +47,51 @@
             <div class="alignleft unselectable" onclick="copyTo('box2');">
               Prompt
             </div>
+            <div class="alignright completion" onclick="doCompletion();">
+              <i class="myfa fa fa-play"></i>
+            </div>
             <!-- <div class="alignright" onclick="toggleState('box2');">
               &#x2194;
             </div> -->
             <div style="clear: both;"></div>
           </h1>
           <div id="prompt" contenteditable="true">
-            <p>This is a placeholder.</p>
+            <p>[prompts go here]</p>
           </div>
         </div>
         <div class="box box3">
           <h1>
             <div class="alignleft unselectable" onclick="copyTo('box3');">
-              Transcribed Speech
+              Speech Tracking
             </div>
             <!-- <div class="alignright" onclick="toggleState('box3');">
               &#x2194;
             </div> -->
-            <div class="alignright listening" onclick="toggleListening()">
+            <div class="alignright listening" onclick="toggleListening();">
               <i class="myfa fa fa-microphone"></i>
             </div>
             <div style="clear: both;"></div>
           </h1>
           <div id="speech" contenteditable="true">
-            <p>Speech results show up here</p>
+            <p>[Speech results show up here]</p>
           </div>
         </div>
         <div class="box box4">
-          <div class="unselectable">
-            <h1 onclick="doCompletion();">Completion</h1>
-          </div>
+          <!-- <div class="alightleft unselectable">
+            <h1>Completion</h1>
+          </div> -->
           <div id="completion" contenteditable="true">
-            <p>this is a placeholder</p>
+            <p></p>
           </div>
         </div>
       </div>
+      <div class="buttons">
+      <button id="downloadButton">Download Script as JSON</button> <input type="file" id="fileInput" accept=".json">
+      <!-- <button id="broadcastButton" class="alightright">Broadcast</button> -->
+      <div class="alignright broadcast" onclick="toggleBroadcast();">
+        Broadcast <i class="myfa fa fa-toggle-off"></i>
+      </div>
+    </div>
     </main>
     <script src="sketch.js"></script>
     <script src="speech-interaction.js"></script>

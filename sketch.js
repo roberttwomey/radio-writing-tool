@@ -5,120 +5,316 @@
 // Speech Object
 //let speechRec;
 
-
-
 let socket;
 
-let gridState = 0;
-
-let gridSizes = [
-  [ "1 / 3", "3 / 5", "5 / 7", "3 / 5"],
-  [ "1 / 5", "5 / 6", "6 / 7", "5 / 6"],
-  [ "1 / 2", "2 / 6", "6 / 7", "2 / 6"],
-  [ "1 / 2", "2 / 3", "3 / 7", "2 / 3"],
-  ];
-
 let lastSelected = "";
+let lastPrompt = "";
+let lastDiv;
 
-let bSpeaking = false;
+let bSpeaking = true;
 let bListening = true;
+let bNewCompletion = false;
+let bBroadcasting = false;
+
+let scriptJSON;
+let lastGenId;
+let prompts = {};
+
+function preload() {
+  scriptJSON = loadJSON("ubik-demo.json");
+}
 
 function setup() {
   noCanvas();
   
-  // Start the socket connection
+  // Start the socket connection for gpt3 server completion
   socket = io.connect('http://localhost:8080')
+  //socket = io.connect('http://54.219.126.173:8080');
+  // socket = io.connect('http://app.radio-play.net:8080');
+
+  socket.on('script', data => {
+    var json = JSON.parse(data);
+    // json = data;
+    console.log('JSON file content:', json);
+    scriptJSON = json;
+    console.log("received new script from server", data.slice(0, 32));
+    // console.log(json.slice(0, 32));
+    // console.log(scriptJSON);
+    jsonToWebpage(json);
+  });
 
   // Callback function
   socket.on('completion', data => {
     // console.log("received completion: "+data);
-    let completion = data["completion"]
-    console.log("received completion: "+completion);
+    let completion = data["completion"];
+    let targetId = data["id"];
+    
+    // get prompt corresponding to this target
+    let lastPrompt = prompts[targetId];
+
+    console.log("received completion: "+completion.slice(0, 32));
+
+    // update completion box
     let targetDiv = select("#completion");
-    targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
+    let thishtml = ""
+    const lines = completion.split(/\r?\n/);
+    lines.forEach((thisline, i) => {   
+      if (thisline) thishtml += "<p contenteditable='true'>"+thisline+"</p>";
+    })
+    // console.log(targetDiv);
+    // let oldHtml = targetDiv.textContent;
+    // targetDiv.html(oldHtml+thishtml);
+    targetDiv.html(thishtml, true);
+
+    // targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
+    
+    // update this generated div in script box
+    let scriptTargetDiv = select("#"+targetId);
+    // thishtml = "<p contenteditable='true'>"+completion+"</p>";
+    
+    // store prompt in tooltip again
+    // console.log("adding tooltip");
+    thishtml +="<span class='tooltiptext'>"+lastPrompt+"</span>";
+    
+    scriptTargetDiv.html(thishtml);
+
+    // console.log(prompts);
+    // console.log("removing prompt from prompts... "+targetId)
+    // delete prompts.targetId;
+    // console.log(prompts)
+    if (bBroadcasting) {
+      console.log("sending script to server.");
+      sendScriptToServer();
+    }
   })
 
   document.addEventListener('selectionchange', () => updateSelection());
   
   speechRec.addEventListener('end', () => startListening());
   speechRec.start(true, true);
-  // speechRec.start(true, true);
+  
+  // don't listen by default, don't speak by default
+  toggleListening();
+  toggleSpeaking();
 
-  // // Create a Speech Recognition object with callback
-  // speechRec = new p5.SpeechRec("en-US", gotSpeech);
-  // // "Continuous recognition" (as opposed to one time only)
-  // let continuous = true;
-  // // If you want to try partial recognition (faster, less accurate)
-  // let interimResults = true;
+  jsonToWebpage(scriptJSON);    
+  requestScriptSocket();
+}
 
-  // // // This must come after setting the properties
-  // speechRec.start(continuous, interimResults);
+function requestScriptSocket() {
+  // request script from server over the websocket
+  socket.emit('script', 0);
+}
 
-  // // DOM element to display results
-  // let output = select("#speech");
+function sendScriptToServer() {
+  // send script to server
+  scriptJSON = scriptToJSON();
+  let jsonString = JSON.stringify(scriptJSON, null, 4);
+  socket.emit('update', jsonString);
+}
 
-  // let lastHtml = "";
-  // let count = 0;
+function jsonToWebpage(scriptJSON) {
+  let data = scriptJSON;
+  // console.log("script json", data.paragraphs[0]);
 
-  // console.log("listening...");
-  // // Speech recognized event
-  // function gotSpeech() {
-  //   // Something is there
-  //   // Get it as a string, you can also get JSON with more info
-  //   console.log(speechRec);
+  let targetDiv = select("#script");
 
-  //   if (speechRec.resultValue) {
-  //     let said = speechRec.resultString;
-  //     if (speechRec.resultJSON.results[count].isFinal) {
-  //       // final, add to html
-  //       let newHtml = lastHtml + "<p>" + said + "</p>";
-  //       output.html(newHtml);
-  //       lastHtml = newHtml;
-  //       count += 1;
-  //     } else {
-  //       // temp, add in light gray
-  //       let tempOutput = lastHtml + "<p style='color: gray'>" + said + '</p>';
-  //       output.html(tempOutput);
-  //     }
-  //   }
-  // }
+  targetDiv.html("");
+
+  // iterate over lines if we are dealing with a multi-line selection
+  for (let i=0; i<data.paragraphs.length; i++) {
+    // console.log(data.paragraphs[i]);
+    thisId = data.paragraphs[i].id;
+    thisType = data.paragraphs[i].type;
+    thisChunk = data.paragraphs[i].text;
+    const textLines = thisChunk.split(/\r?\n/);
+    
+    console.log(textLines);
+    let thishtml = "";
+    if (thisType == "prompt") {
+      thisPrompt = data.paragraphs[i].prompt;
+      const promptLines = thisPrompt.split(/\r?\n/);
+      thishtml = "<div id=\""+thisId+"\" class=\"tooltip "+thisType+"\">";
+      
+      // add prompt as text, in paragraphs
+      textLines.forEach((thisline, i) => {   
+        if (thisline) thishtml += "<p>"+thisline+"</p>";
+      })
+      // add prompt as tooltip, in a tooltip span
+      thishtml += "<span class='tooltiptext'>"
+      lastPrompt = ""
+      promptLines.forEach((thisline, i) => {   
+        // if (thisline) thishtml += thisline+"<br>";
+        if (thisline) {
+          thishtml += '<p>'+thisline+'</p>';
+          lastPrompt += '<p>'+thisline+'</p>';
+        }
+      })
+      thishtml += "</span>"
+      thishtml += "</div>";
+
+      // add html to page
+      targetDiv.html(thishtml, true);
+
+      // prompt it
+      lastGenId = thisId;
+      prompts[lastGenId] = lastPrompt;
+
+       // we are copying this text to the prompt box
+      // copyPromptToBox();
+
+      // do the completion
+      // doCompletion()
+    } else {
+      thishtml = "<div id=\""+thisId+"\" class=\""+thisType+"\">"
+      textLines.forEach((thisline, i) => { 
+        if (thisline) thishtml += "<p>"+thisline+"</p>";
+      })
+      thishtml += "</div>"
+      if (thishtml) targetDiv.html(thishtml, true);
+    };
+  };
+}
+
+function scriptToJSON() {
+  let jsonOut = {};
+  jsonOut.paragraphs = [];
+
+  var childDivs = document.getElementById('script').getElementsByTagName('div');
+  for( i=0; i< childDivs.length; i++ )
+  {
+    var thisDiv = childDivs[i];    
+    
+    let thisChunk = {};
+
+    thisChunk.id = thisDiv.id;
+
+    thisChunk.type = "text";
+
+    if (thisDiv.classList.contains("prompt")) {
+      thisChunk.type = "prompt";
+    
+      let thisPrompt = ""
+      
+      // assume paragraphs are the only children
+      var paragraphs = thisDiv.querySelector('.tooltiptext').children;
+      
+      // loop over paragraphs
+      for (j = 0; j < paragraphs.length; j++) {
+        let thisPara = paragraphs[j];
+        thisPrompt += thisPara.innerHTML+'\n';
+      }
+      thisChunk.prompt = thisPrompt;
+    } else if (thisDiv.classList.contains("text")) {
+      thisChunk.type = "text";
+    }
+
+    thisChunk.text = thisDiv.innerText;
+
+    // console.log(thisChunk);
+    jsonOut.paragraphs.push(thisChunk);
+  }
+  
+  return jsonOut;
+}
+
+function downloadJSON(content) {
+  let contentType = "text/plain";
+  let fileName = "script.json";
+  let a = document.createElement("a");
+  let file = new Blob([content], {type: contentType});
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  a.click();
+}
+
+document.addEventListener('click', function(event) {
+    let targetElement = event.target; // Get the clicked element
+    parseClick(1, targetElement);
+});
+
+document.addEventListener('dblclick', function(event) {
+  let targetElement = event.target; // Get the clicked element
+  parseClick(2, targetElement);
+});
+
+function parseClick(numclicks, targetElement) {
+    // Traverse up the DOM tree until a div is found or the root is reached
+    while (targetElement && targetElement.nodeName !== 'DIV') {
+        targetElement = targetElement.parentNode;
+    }
+
+    if (targetElement) {
+        // Do something with the div element
+        console.log('Clicked inside DIV with id:', targetElement.id);
+        for(let i = 0; i < scriptJSON.paragraphs.length; i++) {
+          thisPara = scriptJSON.paragraphs[i];
+          if (thisPara.id == targetElement.id && thisPara.type == "prompt") {
+            // lastSelected = targetElement.innerHTML;
+            lastPrompt = "" 
+            document.getElementById(targetElement.id).querySelectorAll('span').forEach(element => {
+              // let lines = element.innerHTML.split('<br>');
+              // let lines = Array.from(element.getElementsByTagName("p"));
+              let lines = element.children;
+              // console.log(lines);
+
+              for (j = 0; j < lines.length; j++) {
+                lastPrompt += '<p>'+lines[j].innerText+'</p>';
+              }
+              // lines.forEach((line) => { if (line.length>0) lastPrompt+='<p>'+line.innerText+'</p>'});
+              // lastPrompt+=element.innerHTML;
+            })
+            lastGenId = thisPara.id;
+            prompts[lastGenId] = lastPrompt;
+
+             // we are copying this text to the prompt box
+            copyPromptToBox();
+
+            // do the prompting
+            if (numclicks == 2) doCompletion();
+          }
+        }
+        lastDiv = targetElement;
+    } else {
+        console.log('Clicked outside any DIV');
+    }
 }
 
 // do completion
-
 function doCompletion() {
-  // let promptDiv = select("#prompt");
   let promptDiv = document.getElementById("prompt");
   
-  // let completion = select("#completion");
-  // completion.html("<p>"+prompt.html()+"</p>", true);
-
-  // let prompt = promptDiv.html();
-
-  // convert paragraph elements <p> to lines with newlines
+  // get the list of paragraphs in our prompt window
   let paragraphs = Array.from(promptDiv.getElementsByTagName("p"));
-  // console.log(paragraphs);
 
-  let prompt = ""
+  let promptHtml = "";
+  let gptprompt = "";
   for(let i = 0; i < paragraphs.length; i++) {
     // console.log("paragraphs "+i+" "+paragraphs[i].innerText) // Will print the content of each paragraph
-    prompt+=paragraphs[i].innerText+"\n";
+    // prompt+=paragraphs[i].innerText+"\n"; // ADDED \n twice
+    gptprompt+=paragraphs[i].innerText+"\n";
+    promptHtml+="<p>"+paragraphs[i].innerText+"</p>";
   }
 
-  console.log("prompting: "+prompt);
-  const data = {
-    prompt: prompt
+  console.log("prompting: "+gptprompt.slice(0, 32)+ " for  " + lastGenId);
+
+  const promptData = {
+    prompt: gptprompt,
+    id: lastGenId
   }
+
+  prompts[lastGenId] = promptHtml;
   
-  // prompt the server with the data
-  socket.emit('prompt', data);
-
-  // promptGPT3(prompt.html().toString());
+  // prompt the server with the data over the websocket
+  // return will be handled by callback
+  socket.emit('prompt', promptData);
 }
 
 function copyTo(thisClass) {
   if(thisClass == "box1") {
     target = "#script";
+    if (bSpeaking)
+      sayAndListen(lastSelected);
   } else if (thisClass == "box2") {
     target = "#prompt";
   } else if (thisClass == "box3") {
@@ -134,13 +330,58 @@ function copyTo(thisClass) {
   // iterate over lines if we are dealing with a multi-line selection
   const lines = lastSelected.split(/\r?\n/);
   console.log(lines);
-  lines.forEach((thisline, i) => { 
-    if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+  thishtml = targetDiv.innerHTML;
+  if (target == "#prompt") thishtml = "";
+
+  if (target == "#script" && bNewCompletion == true) {
+    thishtml +="<span class='tooltiptext>";
+    lines.forEach((thisline, i) => {   
+      if (thisline) thishtml += thisline+"<br>";
+    })
+    thishtml += "</span>"
+    bNewCompletion = false;
+  }
+
+  lines.forEach((thisline, i) => {
+    if (thisline) thishtml+="<p>"+thisline+"</p>";
   });
 
+  targetDiv.html(thishtml);
   // targetDiv.html("<p>"+lastSelected+"</p>", true);
   
   lastSelected = "";
+}
+
+function copyPromptToBox() {
+  target = "#prompt";
+  
+  // console.log("copy \""+lastPrompt+"\" to "+target);
+
+  let targetDiv = select(target);
+  targetDiv.html(lastPrompt);
+
+  // // iterate over lines if we are dealing with a multi-line selection
+  // const lines = lastPrompt.split(/\r?\n/);
+  // console.log(lines);
+  // if (target == "#prompt") targetDiv.html("")
+  // lines.forEach((thisline, i) => {
+  //   if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
+  //   // if (thisline) targetDiv.html(thisline, true)
+  // });
+}
+
+function toggleBroadcast(thisClass) {
+  // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
+  let thissymbol = document.getElementsByClassName("broadcast")[0];
+  if (bBroadcasting) {
+    console.log("broadcast off");
+    thissymbol.innerHTML = '<i class="myfa fa fa-toggle-off"></i>';
+    bBroadcasting = false;
+  } else {
+    console.log("broadcast on");
+    thissymbol.innerHTML = '<i class="myfa fa fa-toggle-on"></i>';
+    bBroadcasting = true;
+  }
 }
 
 
@@ -162,6 +403,7 @@ function toggleListening() {
   if (bListening) {
     stopListening()
   } else {
+    bListening = true;
     startListening();
   }
 }
@@ -176,63 +418,105 @@ function stopListening() {
 }
 
 function startListening() {
-  console.log("listening on");
-  let thissymbol = document.getElementsByClassName("listening")[0];
-  thissymbol.innerHTML = '<i class="myfa fa fa-microphone"></i>';
-  bListening = true;
-  speechRec.start(true, true);
-}
-
-// adjusting size of panes
-
-function toggleState(thisClass) {
-  if (thisClass == "box1") {
-    if (gridState == 1) {
-      gridState = 0;
-    } else {
-      gridState = 1
-    }
-  } else if (thisClass == "box2") {
-    if (gridState == 2) {
-      gridState = 0;
-    } else {
-      gridState = 2;
-    }    
-  } else if (thisClass == "box3") {
-    if (gridState == 3) {
-      gridState = 0;
-    } else {
-      gridState = 3;
-    }    
+  if(bListening) {
+    console.log("listening on");
+    let thissymbol = document.getElementsByClassName("listening")[0];
+    thissymbol.innerHTML = '<i class="myfa fa fa-microphone"></i>';
+    // bListening = true;
+    speechRec.start(true, true);
   }
-  updateGridState();
 }
-
-function updateGridState() {
-
-  thisbox = document.getElementsByClassName("box1")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][0];
-  
-  thisbox = document.getElementsByClassName("box2")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][1];
-  
-  thisbox = document.getElementsByClassName("box3")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][2];
-
-  thisbox = document.getElementsByClassName("box4")[0];
-  thisbox.style.gridColumn = gridSizes[gridState][3];
-  
-}
-
-
-// select and copy text
 
 function updateSelection() {
-  // let thisText = document.getSelection().toString();
   let thisText = document.getSelection().toString()
-  console.log(thisText);
+  // console.log(thisText);
   if (thisText != "") {
     // console.log("last selected: "+thisText);
     lastSelected = thisText;  
   }
 }
+
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey) {
+    if (event.key === 'z') {
+      alert('Undo!');
+    } else if (event.key === 's') {
+      thisScript = scriptToJSON();
+      downloadJSON(thisScript);
+    }
+    // } else if (event.key === 'g') {
+    //   if (lastDiv) {
+    //     if (lastDiv.classList.contains('prompt')) {
+    //       console.log("setting "+lastDiv.id+" to be text");
+    //       lastDiv.classList.remove("prompt");
+    //       lastDiv.classList.add("text");
+    //     } else {
+    //       console.log("setting "+lastDiv.id+" to be generative");
+    //       lastDiv.classList.remove("text");
+    //       lastDiv.classList.add("prompt");
+    //       lastGenId = lastDiv.id;
+    //     }
+    //   }
+    // } else if (event.key === 'e') {
+    //   if (lastDiv) {
+    //     if (lastDiv.contentEditable) {
+    //       console.log("setting "+lastDiv.id+" to not be editable...");
+    //       lastDiv.contentEditable = false;
+    //     } else {
+    //       console.log("setting "+lastDiv.id+" to be editable...");
+    //       lastDiv.contentEditable = true;
+    //     }
+    //   }
+    // }
+  }
+});
+
+// // file upload code from ChatGPT4
+// document.getElementById('uploadButton').addEventListener('click', function() {
+//   var fileInput = document.getElementById('fileInput');
+//   var file = fileInput.files[0];
+//   var formData = new FormData();
+//   formData.append('file', file);
+
+//   fetch('/upload', {
+//       method: 'POST',
+//       body: formData
+//   })
+//   .then(response => response.json())
+//   .then(data => console.log(data))
+//   .catch(error => console.error('Error:', error));
+// });
+
+// from here https://editor.p5js.org/amcc/sketches/_pnyek8kr
+
+document.getElementById('fileInput').addEventListener('change', function(event) {
+  var file = event.target.files[0];
+  if (!file) {
+      return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+      var contents = e.target.result;
+      try {
+          var json = JSON.parse(contents);
+          console.log('JSON file content:', json);
+          scriptJSON = json;
+          jsonToWebpage(scriptJSON);
+      } catch (e) {
+          console.error('Error parsing JSON:', e);
+      }
+  };
+
+  reader.onerror = function() {
+      console.error('Error reading file:', reader.error);
+  };
+
+  reader.readAsText(file);
+});
+
+document.getElementById('downloadButton').addEventListener('click', function(event) {
+  thisScript = scriptToJSON();
+  let jsonString = JSON.stringify(thisScript, null, 4);
+  downloadJSON(jsonString);
+});
