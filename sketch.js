@@ -74,7 +74,7 @@ function setup() {
     
     // store prompt in tooltip again
     // console.log("adding tooltip");
-    thishtml +="<span class='tooltiptext'>"+lastPrompt+"</span>";
+    thishtml +="<span class='prompttext'>"+lastPrompt+"</span>";
     
     scriptTargetDiv.html(thishtml);
 
@@ -134,14 +134,14 @@ function jsonToWebpage(scriptJSON) {
     if (thisType == "prompt") {
       thisPrompt = data.paragraphs[i].prompt;
       const promptLines = thisPrompt.split(/\r?\n/);
-      thishtml = "<div id=\""+thisId+"\" class=\"tooltip "+thisType+"\">";
+      thishtml = "<div id=\""+thisId+"\" class=\"gen"+thisType+"\">";
       
       // add prompt as text, in paragraphs
       textLines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
       // add prompt as tooltip, in a tooltip span
-      thishtml += "<span class='tooltiptext'>"
+      thishtml += "<span id='prompttext'>"
       lastPrompt = ""
       promptLines.forEach((thisline, i) => {   
         // if (thisline) thishtml += thisline+"<br>";
@@ -191,13 +191,13 @@ function scriptToJSON() {
 
     thisChunk.type = "text";
 
-    if (thisDiv.classList.contains("prompt")) {
+    if (thisDiv.classList.contains("gen")) {
       thisChunk.type = "prompt";
     
       let thisPrompt = ""
       
       // assume paragraphs are the only children
-      var paragraphs = thisDiv.querySelector('.tooltiptext').children;
+      var paragraphs = thisDiv.querySelector('prompt').children;
       
       // loop over paragraphs
       for (j = 0; j < paragraphs.length; j++) {
@@ -249,20 +249,16 @@ function parseClick(numclicks, targetElement) {
         console.log('Clicked inside DIV with id:', targetElement.id);
         for(let i = 0; i < scriptJSON.paragraphs.length; i++) {
           thisPara = scriptJSON.paragraphs[i];
-          if (thisPara.id == targetElement.id && thisPara.type == "prompt") {
+          if (thisPara.id == targetElement.id && thisPara.type == "gen") {
             // lastSelected = targetElement.innerHTML;
             lastPrompt = "" 
             document.getElementById(targetElement.id).querySelectorAll('span').forEach(element => {
-              // let lines = element.innerHTML.split('<br>');
-              // let lines = Array.from(element.getElementsByTagName("p"));
               let lines = element.children;
               // console.log(lines);
 
               for (j = 0; j < lines.length; j++) {
                 lastPrompt += '<p>'+lines[j].innerText+'</p>';
               }
-              // lines.forEach((line) => { if (line.length>0) lastPrompt+='<p>'+line.innerText+'</p>'});
-              // lastPrompt+=element.innerHTML;
             })
             lastGenId = thisPara.id;
             prompts[lastGenId] = lastPrompt;
@@ -334,7 +330,7 @@ function copyTo(thisClass) {
   if (target == "#prompt") thishtml = "";
 
   if (target == "#script" && bNewCompletion == true) {
-    thishtml +="<span class='tooltiptext>";
+    thishtml +="<span class='prompttext>";
     lines.forEach((thisline, i) => {   
       if (thisline) thishtml += thisline+"<br>";
     })
@@ -470,22 +466,6 @@ document.addEventListener('keydown', function(event) {
     // }
   }
 });
-
-// // file upload code from ChatGPT4
-// document.getElementById('uploadButton').addEventListener('click', function() {
-//   var fileInput = document.getElementById('fileInput');
-//   var file = fileInput.files[0];
-//   var formData = new FormData();
-//   formData.append('file', file);
-
-//   fetch('/upload', {
-//       method: 'POST',
-//       body: formData
-//   })
-//   .then(response => response.json())
-//   .then(data => console.log(data))
-//   .catch(error => console.error('Error:', error));
-// });
 
 // from here https://editor.p5js.org/amcc/sketches/_pnyek8kr
 
