@@ -68,13 +68,13 @@ function setup() {
 
     // targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
     
-    // update this generated div in script box
+    // update this prompterated div in script box
     let scriptTargetDiv = select("#"+targetId);
     // thishtml = "<p contenteditable='true'>"+completion+"</p>";
     
     // store prompt in tooltip again
     // console.log("adding tooltip");
-    thishtml +="<span class='prompttext'>"+lastPrompt+"</span>";
+    thishtml +="<div id='"+targetId+"-prompt' class='prompt'>"+lastPrompt+"</div>";
     
     scriptTargetDiv.html(thishtml);
 
@@ -131,17 +131,17 @@ function jsonToWebpage(scriptJSON) {
     
     console.log(textLines);
     let thishtml = "";
-    if (thisType == "prompt") {
+    if (thisType == "gen") {
       thisPrompt = data.paragraphs[i].prompt;
       const promptLines = thisPrompt.split(/\r?\n/);
-      thishtml = "<div id=\""+thisId+"\" class=\"gen"+thisType+"\">";
+      thishtml = "<div id=\""+thisId+"\" class=\""+thisType+"\">";
       
       // add prompt as text, in paragraphs
       textLines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
-      // add prompt as tooltip, in a tooltip span
-      thishtml += "<span id='prompttext'>"
+      // add prompt as a hidden div
+      thishtml += "<div id='"+thisId+"-prompt' class='prompt'>"
       lastPrompt = ""
       promptLines.forEach((thisline, i) => {   
         // if (thisline) thishtml += thisline+"<br>";
@@ -150,7 +150,7 @@ function jsonToWebpage(scriptJSON) {
           lastPrompt += '<p>'+thisline+'</p>';
         }
       })
-      thishtml += "</span>"
+      thishtml += "</div>"
       thishtml += "</div>";
 
       // add html to page
@@ -161,7 +161,7 @@ function jsonToWebpage(scriptJSON) {
       prompts[lastGenId] = lastPrompt;
 
        // we are copying this text to the prompt box
-      // copyPromptToBox();
+      // copyToPromptBox();
 
       // do the completion
       // doCompletion()
@@ -192,12 +192,12 @@ function scriptToJSON() {
     thisChunk.type = "text";
 
     if (thisDiv.classList.contains("gen")) {
-      thisChunk.type = "prompt";
+      thisChunk.type = "gen";
     
       let thisPrompt = ""
       
       // assume paragraphs are the only children
-      var paragraphs = thisDiv.querySelector('prompt').children;
+      var paragraphs = thisDiv.querySelector('gen').children;
       
       // loop over paragraphs
       for (j = 0; j < paragraphs.length; j++) {
@@ -228,6 +228,59 @@ function downloadJSON(content) {
   a.click();
 }
 
+// function hasClass(element, className) {
+//   return element.classList.contains(className);
+// }
+
+// document.addEventListener('mouseover', function(event) {
+//   let targetElement = event.target;
+//   if (targetElement) {
+//     console.log(targetElement.id);//(targetElement.id));
+//     if (document.getElementById(targetElement.id).classList.contains('gen')) {
+//       console.log(targetElement);
+//       // copy children to prompt box
+//       document.getElementById(element.id+'-prompt').style.display = 'block';
+//     }
+//   }
+// });
+
+document.addEventListener('mouseover', function(event) {
+  let targetElement = event.target;
+  console.log(targetElement);
+  if (targetElement.classList.contains("gen")) {
+    // copy children to prompt box
+    document.getElementById(targetElement.id+'-prompt').style.display = 'none'
+  }
+});
+
+
+// document.addEventListener('mouseout', function(event) {
+//   let targetElement = event.target;
+  
+//   if (targetElement.classList.contains("gen")) {
+//     // copy children to prompt box
+//     document.getElementById(targetElement.id+'-prompt').style.display = 'none'
+//   }
+// });
+
+
+// document.addEventListener('mouseover', function(event) {
+//   let targetElement = event.target;
+  
+//   if (targetElement.classList.contains('gen')) {
+//     // copy children to prompt box
+//     lastPrompt = "";
+//     document.getElementById(targetElement.id).querySelectorAll('div').forEach(element => {
+//       let children = element.children;
+//       // console.log(children);
+//       for (j = 0; j < children.length; j++) {
+//         lastPrompt += '<p>'+children[j].textContent+'</p>';
+//       }
+//     })
+//     copyToPromptBox();
+//   }
+// });
+
 document.addEventListener('click', function(event) {
     let targetElement = event.target; // Get the clicked element
     parseClick(1, targetElement);
@@ -250,21 +303,21 @@ function parseClick(numclicks, targetElement) {
         for(let i = 0; i < scriptJSON.paragraphs.length; i++) {
           thisPara = scriptJSON.paragraphs[i];
           if (thisPara.id == targetElement.id && thisPara.type == "gen") {
-            // lastSelected = targetElement.innerHTML;
             lastPrompt = "" 
-            document.getElementById(targetElement.id).querySelectorAll('span').forEach(element => {
-              let lines = element.children;
-              // console.log(lines);
+            document.getElementById(targetElement.id).querySelectorAll('div').forEach(element => {
+              let children = element.children;
+              // console.log(children);
 
-              for (j = 0; j < lines.length; j++) {
-                lastPrompt += '<p>'+lines[j].innerText+'</p>';
+              for (j = 0; j < children.length; j++) {
+                lastPrompt += '<p>'+children[j].textContent+'</p>';
               }
             })
             lastGenId = thisPara.id;
             prompts[lastGenId] = lastPrompt;
+            // console.log(lastPrompt);
 
              // we are copying this text to the prompt box
-            copyPromptToBox();
+            copyToPromptBox();
 
             // do the prompting
             if (numclicks == 2) doCompletion();
@@ -278,7 +331,7 @@ function parseClick(numclicks, targetElement) {
 
 // do completion
 function doCompletion() {
-  let promptDiv = document.getElementById("prompt");
+  let promptDiv = document.getElementById("promptbox");
   
   // get the list of paragraphs in our prompt window
   let paragraphs = Array.from(promptDiv.getElementsByTagName("p"));
@@ -306,64 +359,11 @@ function doCompletion() {
   socket.emit('prompt', promptData);
 }
 
-function copyTo(thisClass) {
-  if(thisClass == "box1") {
-    target = "#script";
-    if (bSpeaking)
-      sayAndListen(lastSelected);
-  } else if (thisClass == "box2") {
-    target = "#prompt";
-  } else if (thisClass == "box3") {
-    target = "#speech";
-  }
-    // } else if (thisClass == "box4") {
-  //   target = "#completion";
-  // }
-  
-  console.log("copy \""+lastSelected+"\" to "+target);
-  let targetDiv = select(target);
-
-  // iterate over lines if we are dealing with a multi-line selection
-  const lines = lastSelected.split(/\r?\n/);
-  console.log(lines);
-  thishtml = targetDiv.innerHTML;
-  if (target == "#prompt") thishtml = "";
-
-  if (target == "#script" && bNewCompletion == true) {
-    thishtml +="<span class='prompttext>";
-    lines.forEach((thisline, i) => {   
-      if (thisline) thishtml += thisline+"<br>";
-    })
-    thishtml += "</span>"
-    bNewCompletion = false;
-  }
-
-  lines.forEach((thisline, i) => {
-    if (thisline) thishtml+="<p>"+thisline+"</p>";
-  });
-
-  targetDiv.html(thishtml);
-  // targetDiv.html("<p>"+lastSelected+"</p>", true);
-  
-  lastSelected = "";
-}
-
-function copyPromptToBox() {
-  target = "#prompt";
-  
-  // console.log("copy \""+lastPrompt+"\" to "+target);
-
+function copyToPromptBox() {
+  target = "#promptbox";  
+  console.log("copy \""+lastPrompt+"\" to "+target);
   let targetDiv = select(target);
   targetDiv.html(lastPrompt);
-
-  // // iterate over lines if we are dealing with a multi-line selection
-  // const lines = lastPrompt.split(/\r?\n/);
-  // console.log(lines);
-  // if (target == "#prompt") targetDiv.html("")
-  // lines.forEach((thisline, i) => {
-  //   if (thisline) targetDiv.html("<p>"+thisline+"</p>", true)
-  //   // if (thisline) targetDiv.html(thisline, true)
-  // });
 }
 
 function toggleBroadcast(thisClass) {
@@ -447,7 +447,7 @@ document.addEventListener('keydown', function(event) {
     //       lastDiv.classList.remove("prompt");
     //       lastDiv.classList.add("text");
     //     } else {
-    //       console.log("setting "+lastDiv.id+" to be generative");
+    //       console.log("setting "+lastDiv.id+" to be prompterative");
     //       lastDiv.classList.remove("text");
     //       lastDiv.classList.add("prompt");
     //       lastGenId = lastDiv.id;
