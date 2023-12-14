@@ -230,7 +230,15 @@ function downloadJSON(content) {
 
 document.addEventListener('click', function(event) {
     let targetElement = event.target; // Get the clicked element
+    parseClick(1, targetElement);
+});
 
+document.addEventListener('dblclick', function(event) {
+  let targetElement = event.target; // Get the clicked element
+  parseClick(2, targetElement);
+});
+
+function parseClick(numclicks, targetElement) {
     // Traverse up the DOM tree until a div is found or the root is reached
     while (targetElement && targetElement.nodeName !== 'DIV') {
         targetElement = targetElement.parentNode;
@@ -263,15 +271,14 @@ document.addEventListener('click', function(event) {
             copyPromptToBox();
 
             // do the prompting
-            // doCompletion();
+            if (numclicks == 2) doCompletion();
           }
         }
         lastDiv = targetElement;
     } else {
         console.log('Clicked outside any DIV');
     }
-});
-
+}
 
 // do completion
 function doCompletion() {
@@ -510,31 +517,6 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
 
 document.getElementById('downloadButton').addEventListener('click', function(event) {
   thisScript = scriptToJSON();
-  downloadJSON(thisScript);
+  let jsonString = JSON.stringify(thisScript, null, 4);
+  downloadJSON(jsonString);
 });
-
-// function handleFiles() {
-//   const fileList = this.files; /* now you can work with the file list */
-//   const file = fileList[0]
-//   console.log(file)
-
-//   var reader = new FileReader();
-
-//   const blob = new Blob([file], {type:"application/json"});
-
-//   reader.onload = function(e) {
-//     // if (file.type === 'image/png' || file.type === 'image/jpeg') {
-//     //   img = createImg(e.target.result, '');
-//     //   img.hide();
-//     // } else {
-//     //   img = null;
-//     // }
-//     if (file.type === '"application/json') {
-//       console.log(e.target.result, JSON.parse(reader.result));
-//     }
-//   }
-
-//   // reader.readAsDataURL(file);
-//   reader.readAsText(blob);
-
-// }
