@@ -89,6 +89,8 @@ echo "OPENAI_API_KEY=XXXXXX" > .env
 
 # Usage
 
+Run with node (standalone) or with pm2 (kind of as a service)
+
 ```
 node writing-tool.js
 ```
@@ -103,9 +105,6 @@ pm2 start writing-tool.js
 *Visit in Browser*
 
 Open `localhost:8080` in Browser (on mac, Safari or Chrome best implement webSpeech). (speechRec isn't working in edge)
-
-
-
 
 ## Running with pm2
 
