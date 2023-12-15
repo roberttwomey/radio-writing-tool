@@ -1,9 +1,6 @@
-// WebSpeech rec for radio-play
+// AI writing tool for Latent Theater
 // radio-play.net
-// adapted from https://github.com/shiffman/A2Z-F18
-
-// Speech Object
-//let speechRec;
+// Robert Twomey - 2023
 
 let socket;
 
@@ -56,15 +53,15 @@ function setup() {
 
     // update completion box
     let targetDiv = select("#completion");
-    let thishtml = ""
+    let thisCompletionHtml = ""
     const lines = completion.split(/\r?\n/);
     lines.forEach((thisline, i) => {   
-      if (thisline) thishtml += "<p contenteditable='true'>"+thisline+"</p>";
+      if (thisline) thisCompletionHtml += "<p contenteditable='true'>"+thisline+"</p>";
     })
     // console.log(targetDiv);
     // let oldHtml = targetDiv.textContent;
     // targetDiv.html(oldHtml+thishtml);
-    targetDiv.html(thishtml, true);
+    targetDiv.html(thisCompletionHtml, true);
 
     // targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
     
@@ -74,9 +71,10 @@ function setup() {
     
     // store prompt in tooltip again
     // console.log("adding tooltip");
-    thishtml +="<div id='"+targetId+"-prompt' class='prompt'>"+lastPrompt+"</div>";
-    
-    scriptTargetDiv.html(thishtml);
+    thisScriptHtml = "<div id='"+targetId+"-completion' class='completion'>";
+    thisScriptHtml += thisCompletionHtml + "</div>";
+    thisScriptHtml +="<div id='"+targetId+"-prompt' class='prompt hidden'>"+lastPrompt+"</div>";
+    scriptTargetDiv.html(thisScriptHtml);
 
     // console.log(prompts);
     // console.log("removing prompt from prompts... "+targetId)
@@ -129,19 +127,22 @@ function jsonToWebpage(scriptJSON) {
     thisChunk = data.paragraphs[i].text;
     const textLines = thisChunk.split(/\r?\n/);
     
-    console.log(textLines);
+    // console.log(textLines);
     let thishtml = "";
     if (thisType == "gen") {
       thisPrompt = data.paragraphs[i].prompt;
       const promptLines = thisPrompt.split(/\r?\n/);
       thishtml = "<div id=\""+thisId+"\" class=\""+thisType+"\">";
       
+      thishtml += "<div id='"+thisId+"-completion' class='completion'>"
       // add prompt as text, in paragraphs
       textLines.forEach((thisline, i) => {   
         if (thisline) thishtml += "<p>"+thisline+"</p>";
       })
+      thishtml += "</div>" // text div
+
       // add prompt as a hidden div
-      thishtml += "<div id='"+thisId+"-prompt' class='prompt'>"
+      thishtml += "<div id='"+thisId+"-prompt' class='prompt hidden'>"
       lastPrompt = ""
       promptLines.forEach((thisline, i) => {   
         // if (thisline) thishtml += thisline+"<br>";
@@ -150,8 +151,8 @@ function jsonToWebpage(scriptJSON) {
           lastPrompt += '<p>'+thisline+'</p>';
         }
       })
-      thishtml += "</div>"
-      thishtml += "</div>";
+      thishtml += "</div>"; // prompt div
+      thishtml += "</div>"; // main div
 
       // add html to page
       targetDiv.html(thishtml, true);
@@ -174,6 +175,8 @@ function jsonToWebpage(scriptJSON) {
       if (thishtml) targetDiv.html(thishtml, true);
     };
   };
+
+  // addSwapper();
 }
 
 function scriptToJSON() {
@@ -244,14 +247,30 @@ function downloadJSON(content) {
 //   }
 // });
 
-document.addEventListener('mouseover', function(event) {
-  let targetElement = event.target;
-  console.log(targetElement);
-  if (targetElement.classList.contains("gen")) {
-    // copy children to prompt box
-    document.getElementById(targetElement.id+'-prompt').style.display = 'none'
-  }
-});
+// document.addEventListener('mouseover', function(event) {
+//   let targetElement = event.target;
+//   console.log(targetElement);
+//   if (targetElement.classList.contains("gen")) {
+//     // copy children to prompt box
+//     document.getElementById(targetElement.id+'-prompt').style.display = 'none'
+//   }
+// });
+
+// function addSwapper() {
+//   var elements = Array.from(document.getElementsByClassName('prompt'));
+//   console.log("addSwapper: "+elements);
+//   for (let i=0; i<elements.length; i++) {
+//     thisElement = elements[i];
+//     thisElement.addEventListener('mousemove', function() {
+//       console.log("HI");
+//       thisElement.style.display = 'block';
+//     });
+
+//     thisElement.addEventListener('mouseleave', function() {
+//       thisElement.style.display = 'none';
+//     });
+//   }
+// };
 
 
 // document.addEventListener('mouseout', function(event) {
@@ -283,15 +302,15 @@ document.addEventListener('mouseover', function(event) {
 
 document.addEventListener('click', function(event) {
     let targetElement = event.target; // Get the clicked element
-    parseClick(1, targetElement);
+    parseClick(1, targetElement, event.shiftKey);
 });
 
 document.addEventListener('dblclick', function(event) {
   let targetElement = event.target; // Get the clicked element
-  parseClick(2, targetElement);
+  parseClick(2, targetElement, event.shiftKey);
 });
 
-function parseClick(numclicks, targetElement) {
+function parseClick(numclicks, targetElement, shiftKey) {
     // Traverse up the DOM tree until a div is found or the root is reached
     while (targetElement && targetElement.nodeName !== 'DIV') {
         targetElement = targetElement.parentNode;
@@ -299,34 +318,53 @@ function parseClick(numclicks, targetElement) {
 
     if (targetElement) {
         // Do something with the div element
-        console.log('Clicked inside DIV with id:', targetElement.id);
+        // console.log('Clicked inside DIV with id:', targetElement.id);
+
         for(let i = 0; i < scriptJSON.paragraphs.length; i++) {
           thisPara = scriptJSON.paragraphs[i];
-          if (thisPara.id == targetElement.id && thisPara.type == "gen") {
-            lastPrompt = "" 
-            document.getElementById(targetElement.id).querySelectorAll('div').forEach(element => {
-              let children = element.children;
-              // console.log(children);
+          let thisId = targetElement.id.split('-')[0];
+          let thisType = targetElement.id.split('-')[1]
+          // console.log(thisId, thisPara.id);
+          if (thisPara.id == thisId && thisPara.type == "gen") {
+            lastPrompt = ""
+            // console.log(document.getElementById(targetElement.id).querySelectorAll('p'));
 
-              for (j = 0; j < children.length; j++) {
-                lastPrompt += '<p>'+children[j].textContent+'</p>';
-              }
+            // if (thisType == 'prompt') {
+            //   document.getElementById(targetElement.id).querySelectorAll('p').forEach(element => {
+            //     lastPrompt += '<p>'+element.textContent+'</p>';
+            //   })
+            document.getElementById(thisId+'-prompt').querySelectorAll('p').forEach(element => {
+                lastPrompt += '<p>'+element.textContent+'</p>';
             })
+
             lastGenId = thisPara.id;
             prompts[lastGenId] = lastPrompt;
             // console.log(lastPrompt);
 
-             // we are copying this text to the prompt box
+            // we are copying this text to the prompt box
             copyToPromptBox();
 
             // do the prompting
             if (numclicks == 2) doCompletion();
+            if ((shiftKey) && (numclicks == 1)) swapPromptCompletion(thisId);
           }
+          
+          
         }
         lastDiv = targetElement;
     } else {
         console.log('Clicked outside any DIV');
     }
+}
+
+function swapPromptCompletion(thisid) {
+  // let targetElement = document.getElementById(thisid);
+  // if (targetElement.classList.contains('gen')) {
+  let prompt = document.getElementById(thisid+'-prompt');
+  let completion = document.getElementById(thisid+'-completion');
+  // console.log(prompt, completion);
+  prompt.classList.toggle("hidden");
+  completion.classList.toggle("hidden");
 }
 
 // do completion
