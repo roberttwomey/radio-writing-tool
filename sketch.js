@@ -200,7 +200,7 @@ function scriptToJSON() {
     
       // retrieve prompt paragraphs
       let thisPrompt = ""
-      console.log(thisDiv);
+      // console.log(thisDiv);
       var paragraphs = thisDiv.querySelector('.prompt').children;
       
       // loop over prompt paragraphs
@@ -213,7 +213,7 @@ function scriptToJSON() {
       // retrieve completion paragraphs
       let thisCompletion = "";
       var paragraphs = thisDiv.querySelector('.completion').children;
-      console.log(paragraphs);
+      // console.log(paragraphs);
       // loop over paragraphs
       for (j = 0; j < paragraphs.length; j++) {
         let thisPara = paragraphs[j];
