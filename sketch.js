@@ -184,6 +184,7 @@ function scriptToJSON() {
   jsonOut.paragraphs = [];
 
   var childDivs = document.getElementById('script').getElementsByTagName('div');
+  // console.log(childDivs);
   for( i=0; i< childDivs.length; i++ )
   {
     var thisDiv = childDivs[i];    
@@ -191,28 +192,40 @@ function scriptToJSON() {
     let thisChunk = {};
 
     thisChunk.id = thisDiv.id;
-
     thisChunk.type = "text";
-
+    
     if (thisDiv.classList.contains("gen")) {
+      // for generative blocks we have both a prompt and a text
       thisChunk.type = "gen";
     
+      // retrieve prompt paragraphs
       let thisPrompt = ""
+      console.log(thisDiv);
+      var paragraphs = thisDiv.querySelector('.prompt').children;
       
-      // assume paragraphs are the only children
-      var paragraphs = thisDiv.querySelector('gen').children;
-      
-      // loop over paragraphs
+      // loop over prompt paragraphs
       for (j = 0; j < paragraphs.length; j++) {
         let thisPara = paragraphs[j];
         thisPrompt += thisPara.innerHTML+'\n';
       }
       thisChunk.prompt = thisPrompt;
-    } else if (thisDiv.classList.contains("text")) {
-      thisChunk.type = "text";
-    }
 
-    thisChunk.text = thisDiv.innerText;
+      // retrieve completion paragraphs
+      let thisCompletion = "";
+      var paragraphs = thisDiv.querySelector('.completion').children;
+      console.log(paragraphs);
+      // loop over paragraphs
+      for (j = 0; j < paragraphs.length; j++) {
+        let thisPara = paragraphs[j];
+        thisCompletion += thisPara.innerHTML+'\n';
+      }
+      thisChunk.text = thisCompletion;
+
+    } else if (thisDiv.classList.contains(".text")) {
+      // for text blocks, all of the script is in the inner text
+      thisChunk.type = "text";
+      thisChunk.text = thisDiv.innerText;
+    }
 
     // console.log(thisChunk);
     jsonOut.paragraphs.push(thisChunk);
