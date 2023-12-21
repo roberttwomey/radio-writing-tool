@@ -221,14 +221,17 @@ function scriptToJSON() {
       }
       thisChunk.text = thisCompletion;
 
-    } else if (thisDiv.classList.contains(".text")) {
+      // console.log(thisChunk);
+      jsonOut.paragraphs.push(thisChunk);
+
+    } else if (thisDiv.classList.contains("text")) {
       // for text blocks, all of the script is in the inner text
       thisChunk.type = "text";
       thisChunk.text = thisDiv.innerText;
-    }
 
-    // console.log(thisChunk);
-    jsonOut.paragraphs.push(thisChunk);
+      // console.log(thisChunk);
+      jsonOut.paragraphs.push(thisChunk);
+    }
   }
   
   return jsonOut;
