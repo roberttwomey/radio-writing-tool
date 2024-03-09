@@ -58,8 +58,11 @@ speechRec.onresult = (event) => {
     let tempspeechoutput = lastHtml + "<p style='color: gray'>" + said + "</p>";
     speechoutput.innerHTML = tempspeechoutput;
     // speechoutput.style.color = "gray";
+
+    // locatedAndHighlight(tempspeechoutput); 
   }
 };
+
 
 // // synthesis
 const speechSynth = window.speechSynthesis;

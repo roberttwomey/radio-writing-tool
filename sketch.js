@@ -16,6 +16,7 @@ let bBroadcasting = false;
 let scriptJSON;
 let lastGenId;
 let prompts = {};
+let contextText, fullText;
 
 function preload() {
   scriptJSON = loadJSON("ubik-demo.json");
@@ -25,9 +26,8 @@ function setup() {
   noCanvas();
   
   // Start the socket connection for gpt3 server completion
-  socket = io.connect('http://localhost:8080')
-  //socket = io.connect('http://54.219.126.173:8080');
-  // socket = io.connect('http://app.radio-play.net:8080');
+  socket = io.connect('http://localhost:8080');
+  // socket = io.connect('http://app.radio-play.net:8080')
 
   socket.on('script', data => {
     var json = JSON.parse(data);
@@ -119,6 +119,8 @@ function jsonToWebpage(scriptJSON) {
 
   targetDiv.html("");
 
+  fullText = "";
+
   // iterate over lines if we are dealing with a multi-line selection
   for (let i=0; i<data.paragraphs.length; i++) {
     // console.log(data.paragraphs[i]);
@@ -137,7 +139,10 @@ function jsonToWebpage(scriptJSON) {
       thishtml += "<div id='"+thisId+"-completion' class='completion'>"
       // add prompt as text, in paragraphs
       textLines.forEach((thisline, i) => {   
-        if (thisline) thishtml += "<p>"+thisline+"</p>";
+        if (thisline) {
+          thishtml += "<p>"+thisline+"</p>";
+          fullText += thisline+'\n';
+        }
       })
       thishtml += "</div>" // text div
 
@@ -170,12 +175,13 @@ function jsonToWebpage(scriptJSON) {
       thishtml = "<div id=\""+thisId+"\" class=\""+thisType+"\">"
       textLines.forEach((thisline, i) => { 
         if (thisline) thishtml += "<p>"+thisline+"</p>";
+        fullText += thisline+'\n';
       })
       thishtml += "</div>"
       if (thishtml) targetDiv.html(thishtml, true);
     };
   };
-
+  console.log("FULL TEXT==="+fullText);
   // addSwapper();
 }
 
@@ -486,6 +492,8 @@ function updateSelection() {
   }
 }
 
+// keyboard shortcuts 
+
 document.addEventListener('keydown', function(event) {
   if (event.ctrlKey) {
     if (event.key === 'z') {
@@ -521,6 +529,8 @@ document.addEventListener('keydown', function(event) {
   }
 });
 
+
+// ======== File upload and download ======== //
 // from here https://editor.p5js.org/amcc/sketches/_pnyek8kr
 
 document.getElementById('fileInput').addEventListener('change', function(event) {

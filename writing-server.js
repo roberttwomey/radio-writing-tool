@@ -91,7 +91,7 @@ io.sockets.on('connection', (socket) => {
 
       console.log("received prompt: " + prompt + " for " + targetId);
 
-      promptGPT3(prompt, targetId, socket)
+      promptGPT(prompt, targetId, socket)
 
     });
 
@@ -118,7 +118,8 @@ io.sockets.on('connection', (socket) => {
       scriptJSON = data;
 
       let json = JSON.parse(data);
-      // store script locally
+
+      // cache script locally
       saveScriptJSON(data);
 
       // broadcast updated script to all clients
@@ -148,7 +149,7 @@ console.log('--== GPT Bot Ready ==--');
 
 let prompt = ``;
 
-function promptGPT3(thisprompt, targetId, socket) {
+function promptGPT(thisprompt, targetId, socket) {
 
   console.log(`~ this is a new prompt: ${thisprompt} on ${socket}`);
 
@@ -173,7 +174,7 @@ function promptGPT3(thisprompt, targetId, socket) {
     prompt = gpt_args['prompt']
 
     console.log(`prompt: ${prompt.slice(0, 64)}...`);
-          // console.log(`prompt: ${gpt_args['prompt']}`);
+    // console.log(`prompt: ${gpt_args['prompt']}`);
     // const gptResponse = await openai.createCompletion(gpt_args);
 
     // new ChatCompletions https://github.com/openai/openai-node#usage
