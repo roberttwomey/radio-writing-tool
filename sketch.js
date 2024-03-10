@@ -3,6 +3,8 @@
 // Robert Twomey - 2023
 
 let socket;
+let serverURL = 'http://localhost:8080';
+// let serverURL ='http://app.radio-play.net:8080';
 
 let lastSelected = "";
 let lastPrompt = "";
@@ -25,78 +27,83 @@ function preload() {
 function setup() {
   noCanvas();
   
-  // Start the socket connection for gpt3 server completion
-  socket = io.connect('http://localhost:8080');
-  // socket = io.connect('http://app.radio-play.net:8080')
+  // setup socket to LLM completion server
+  socket = io.connect(serverURL);
 
-  socket.on('script', data => {
-    var json = JSON.parse(data);
-    // json = data;
-    console.log('JSON file content:', json);
-    scriptJSON = json;
-    console.log("received new script from server", data.slice(0, 32));
-    // console.log(json.slice(0, 32));
-    // console.log(scriptJSON);
-    jsonToWebpage(json);
-  });
+  // socket callbacks
+  socket.on('script', (data) => { processScript(data)});
+  socket.on('completion', (data) => {processCompletion(data)});
 
-  // Callback function
-  socket.on('completion', data => {
-    // console.log("received completion: "+data);
-    let completion = data["completion"];
-    let targetId = data["id"];
-    
-    // get prompt corresponding to this target
-    let lastPrompt = prompts[targetId];
-
-    console.log("received completion: "+completion.slice(0, 32));
-
-    // update completion box
-    let targetDiv = select("#completion");
-    let thisCompletionHtml = ""
-    const lines = completion.split(/\r?\n/);
-    lines.forEach((thisline, i) => {   
-      if (thisline) thisCompletionHtml += "<p contenteditable='true'>"+thisline+"</p>";
-    })
-    // console.log(targetDiv);
-    // let oldHtml = targetDiv.textContent;
-    // targetDiv.html(oldHtml+thishtml);
-    targetDiv.html(thisCompletionHtml, true);
-
-    // targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
-    
-    // update this prompterated div in script box
-    let scriptTargetDiv = select("#"+targetId);
-    // thishtml = "<p contenteditable='true'>"+completion+"</p>";
-    
-    // store prompt in tooltip again
-    // console.log("adding tooltip");
-    thisScriptHtml = "<div id='"+targetId+"-completion' class='completion'>";
-    thisScriptHtml += thisCompletionHtml + "</div>";
-    thisScriptHtml +="<div id='"+targetId+"-prompt' class='prompt hidden'>"+lastPrompt+"</div>";
-    scriptTargetDiv.html(thisScriptHtml);
-
-    // console.log(prompts);
-    // console.log("removing prompt from prompts... "+targetId)
-    // delete prompts.targetId;
-    // console.log(prompts)
-    if (bBroadcasting) {
-      console.log("sending script to server.");
-      sendScriptToServer();
-    }
-  })
-
+  // webpage callbacks
   document.addEventListener('selectionchange', () => updateSelection());
   
+  // speech callbacks
   speechRec.addEventListener('end', () => startListening());
   speechRec.start(true, true);
   
-  // don't listen by default, don't speak by default
-  toggleListening();
-  toggleSpeaking();
+  // start with no speech no listening
+  stopListening();
+  stopSpeaking();
 
-  jsonToWebpage(scriptJSON);    
+  // request script and create webpage
   requestScriptSocket();
+  jsonToWebpage(scriptJSON);    
+}
+
+function processScript(data) {
+  var json = JSON.parse(data);
+  // json = data;
+  console.log('JSON file content:', json);
+  scriptJSON = json;
+  console.log("received new script from server", data.slice(0, 32));
+  // console.log(json.slice(0, 32));
+  // console.log(scriptJSON);
+  jsonToWebpage(json);
+}
+
+function processCompletion(data) {
+  // console.log("received completion: "+data);
+  let completion = data["completion"];
+  let targetId = data["id"];
+  
+  // get prompt corresponding to this target
+  let lastPrompt = prompts[targetId];
+
+  console.log("received completion: "+completion.slice(0, 32));
+
+  // update completion box
+  let targetDiv = select("#completion");
+  let thisCompletionHtml = ""
+  const lines = completion.split(/\r?\n/);
+  lines.forEach((thisline, i) => {   
+    if (thisline) thisCompletionHtml += "<p contenteditable='true'>"+thisline+"</p>";
+  })
+  // console.log(targetDiv);
+  // let oldHtml = targetDiv.textContent;
+  // targetDiv.html(oldHtml+thishtml);
+  targetDiv.html(thisCompletionHtml, true);
+
+  // targetDiv.html("<p contenteditable='true'>"+completion+"</p>", true);
+  
+  // update this prompterated div in script box
+  let scriptTargetDiv = select("#"+targetId);
+  // thishtml = "<p contenteditable='true'>"+completion+"</p>";
+  
+  // store prompt in tooltip again
+  // console.log("adding tooltip");
+  thisScriptHtml = "<div id='"+targetId+"-completion' class='completion'>";
+  thisScriptHtml += thisCompletionHtml + "</div>";
+  thisScriptHtml +="<div id='"+targetId+"-prompt' class='prompt hidden'>"+lastPrompt+"</div>";
+  scriptTargetDiv.html(thisScriptHtml);
+
+  // console.log(prompts);
+  // console.log("removing prompt from prompts... "+targetId)
+  // delete prompts.targetId;
+  // console.log(prompts)
+  if (bBroadcasting) {
+    console.log("sending script to server.");
+    sendScriptToServer();
+  }
 }
 
 function requestScriptSocket() {
@@ -440,7 +447,6 @@ function toggleBroadcast(thisClass) {
   }
 }
 
-
 function toggleSpeaking(thisClass) {
   // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
   let thissymbol = document.getElementsByClassName("speaking")[0];
@@ -453,6 +459,14 @@ function toggleSpeaking(thisClass) {
     thissymbol.innerHTML = '<i class="myfa fa fa-toggle-on"></i>';
     bSpeaking = true;
   }
+}
+
+function stopSpeaking(thisClass) {
+  // good font-awesome reference https://editor.p5js.org/simon_oakey/sketches/eQg6VvOUf
+  let thissymbol = document.getElementsByClassName("speaking")[0];
+  console.log("speaking off");
+  thissymbol.innerHTML = '<i class="myfa fa fa-toggle-off"></i>';
+  bSpeaking = false;
 }
 
 function toggleListening() {
@@ -529,10 +543,8 @@ document.addEventListener('keydown', function(event) {
   }
 });
 
-
 // ======== File upload and download ======== //
 // from here https://editor.p5js.org/amcc/sketches/_pnyek8kr
-
 document.getElementById('fileInput').addEventListener('change', function(event) {
   var file = event.target.files[0];
   if (!file) {
@@ -564,3 +576,57 @@ document.getElementById('downloadButton').addEventListener('click', function(eve
   let jsonString = JSON.stringify(thisScript, null, 4);
   downloadJSON(jsonString);
 });
+
+//
+function findInScript(pattern, maxErrors = 10) {
+
+  var childDivs = document.getElementById('script').getElementsByTagName('div');
+  // console.log(childDivs);
+
+  let foundDivId, foundDivType, foundStart, foundEnd;
+  let found = false;
+
+  for( i=0; i< childDivs.length; i++ )
+  {
+    var thisDiv = childDivs[i];    
+    
+    let thisChunk = {};
+
+    thisChunk.id = thisDiv.id;
+    thisChunk.type = "text";
+    
+    if (thisDiv.classList.contains("gen")) {
+      var paragraphs = thisDiv.querySelector('.completion').children;
+      // console.log(paragraphs);
+      // loop over paragraphs
+      for (j = 0; j < paragraphs.length; j++) {
+        let thisText = paragraphs[j]
+        const matches = search(thisText, pattern, maxErrors);
+        if (matches.length > 0) {
+          foundDivId = thisDiv.id;
+          foundDivType = "text";
+          foundStart = matches[0].start;
+          foundEnd = matches[0].end;
+          found = true;
+          break;
+        }
+  
+      }
+      thisChunk.text = thisCompletion;
+    } else if (thisDiv.classList.contains("text")) {
+      // for text blocks, all of the script is in the inner text
+      let thisText = thisDiv.innerText;
+      const matches = search(thisText, pattern, maxErrors);
+      if (matches.length > 0) {
+        foundDivId = thisDiv.id;
+        foundDivType = "text";
+        foundStart = matches[0].start;
+        foundEnd = matches[0].end;
+        found=true;
+        break;
+      }
+    }
+  }
+  console.log(found, foundDivId, foundDivType, foundStart, foundEnd);
+  // return jsonOut;
+}

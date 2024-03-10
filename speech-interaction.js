@@ -59,7 +59,7 @@ speechRec.onresult = (event) => {
     speechoutput.innerHTML = tempspeechoutput;
     // speechoutput.style.color = "gray";
 
-    // locatedAndHighlight(tempspeechoutput); 
+    findInScript(tempspeechoutput); 
   }
 };
 
