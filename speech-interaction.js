@@ -52,14 +52,13 @@ speechRec.onresult = (event) => {
     lastHtml = speechoutput.innerHTML;
     // startListening();
     // speechRec.start(true, true);
-
+    socket.emit('find', said); 
   } else {
     // temp result: display in light gray
     let tempspeechoutput = lastHtml + "<p style='color: gray'>" + said + "</p>";
     speechoutput.innerHTML = tempspeechoutput;
     // speechoutput.style.color = "gray";
 
-    findInScript(tempspeechoutput); 
   }
 };
 

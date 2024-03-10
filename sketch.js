@@ -1,6 +1,6 @@
 // AI writing tool for Latent Theater
 // radio-play.net
-// Robert Twomey - 2023
+// Robert Twomey - 2024
 
 let socket;
 let serverURL = 'http://localhost:8080';
@@ -33,6 +33,7 @@ function setup() {
   // socket callbacks
   socket.on('script', (data) => { processScript(data)});
   socket.on('completion', (data) => {processCompletion(data)});
+  socket.on('found', (data) => {processSearch(data)});
 
   // webpage callbacks
   document.addEventListener('selectionchange', () => updateSelection());
@@ -48,6 +49,26 @@ function setup() {
   // request script and create webpage
   requestScriptSocket();
   jsonToWebpage(scriptJSON);    
+}
+
+function highlightLetters(segmentHTML, startPos, endPos) {
+  let result = segmentHTML.slice(0, startPos) + "<span style='background-color:pink;'>" + segmentHTML.slice(startPos, endPos) + "</span>" + segmentHTML.slice(endPos);
+  console.log("edited html: ", result)
+  return result;
+}
+
+function processSearch(data) {
+  console.log("result: ", data);
+  let thisId;
+  if (data.type == "text") {
+    thisId = "#"+data.id;
+  } else if (data.type == "gen") {
+    thisId = "#"+data.id+"-completion";
+  }
+  // var text1 = document.querySelector(thisId).innerHTML;
+  // document.querySelector(thisId).innerHTML = highlightLetters(text1, data.start, data.end);
+  var text1 = document.querySelector(thisId).innerHTML;
+  document.querySelector(thisId).innerHTML = highlightLetters(text1, data.start, data.end);
 }
 
 function processScript(data) {
@@ -577,56 +598,3 @@ document.getElementById('downloadButton').addEventListener('click', function(eve
   downloadJSON(jsonString);
 });
 
-//
-function findInScript(pattern, maxErrors = 10) {
-
-  var childDivs = document.getElementById('script').getElementsByTagName('div');
-  // console.log(childDivs);
-
-  let foundDivId, foundDivType, foundStart, foundEnd;
-  let found = false;
-
-  for( i=0; i< childDivs.length; i++ )
-  {
-    var thisDiv = childDivs[i];    
-    
-    let thisChunk = {};
-
-    thisChunk.id = thisDiv.id;
-    thisChunk.type = "text";
-    
-    if (thisDiv.classList.contains("gen")) {
-      var paragraphs = thisDiv.querySelector('.completion').children;
-      // console.log(paragraphs);
-      // loop over paragraphs
-      for (j = 0; j < paragraphs.length; j++) {
-        let thisText = paragraphs[j]
-        const matches = search(thisText, pattern, maxErrors);
-        if (matches.length > 0) {
-          foundDivId = thisDiv.id;
-          foundDivType = "text";
-          foundStart = matches[0].start;
-          foundEnd = matches[0].end;
-          found = true;
-          break;
-        }
-  
-      }
-      thisChunk.text = thisCompletion;
-    } else if (thisDiv.classList.contains("text")) {
-      // for text blocks, all of the script is in the inner text
-      let thisText = thisDiv.innerText;
-      const matches = search(thisText, pattern, maxErrors);
-      if (matches.length > 0) {
-        foundDivId = thisDiv.id;
-        foundDivType = "text";
-        foundStart = matches[0].start;
-        foundEnd = matches[0].end;
-        found=true;
-        break;
-      }
-    }
-  }
-  console.log(found, foundDivId, foundDivType, foundStart, foundEnd);
-  // return jsonOut;
-}

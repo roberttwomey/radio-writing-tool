@@ -1,3 +1,7 @@
+
+// 
+const approx = require('./string-match.js');
+
 // HTTP Portion
 var http = require('http');
 
@@ -117,7 +121,7 @@ io.sockets.on('connection', (socket) => {
       // update script in memory from update
       scriptJSON = data;
 
-      let json = JSON.parse(data);
+      // let json = JSON.parse(data);
 
       // cache script locally
       saveScriptJSON(data);
@@ -137,8 +141,69 @@ io.sockets.on('connection', (socket) => {
       console.log("broadcast updated script requesting client")
     });
 
+    socket.on('find',(data) => {
+      // requested script
+      console.log(socket.id+" find string " + data);
+      
+      const pattern = data;
+      // const pattern = "Introducing you back the ultimate home automation device";
+//       const text = `An AI, A Half-Dead and a group of paranormal friends walk into a pre-cog bar
+
+// ========
+
+// INTRO ADVERTISEMENT
+
+// Introducing Ubik, the ultimate home automation device that seamlessly integrates all your smart devices and transforms your living space into a futuristic haven. Control your lights, thermostats, and security systems with a simple voice command or effortlessly through our companion app. Upgrade your home with Ubik and experience unparalleled convenience and comfort like never before.
+
+// INT. RETRO-FUTURISTIC APARTMENT - DAY
+
+// Joe Chip's apartment is a perfectly curated time capsule of retro-futuristic design. The walls are adorned with vibrant, geometric patterns, while a fluorescent orange shag carpet covers the floor. Sun rays filter through the room, reflecting off the chrome accents of the myriad of automatic appliances lining the walls. From the coin-operated coffee machine to the self-cleaning shower, every aspect of the apartment begs for a handful of coins to activate its mechanical wonders. Ironically, Joe stands in the center of his technologically advanced domain, empty pockets jingling with nothing but the reminder of his financial hardship.`;
+      // results = findInScript();
+      // console.log(scriptJSON);
+      // socket.emit('script', scriptJSON);
+      // const matches = approx.search(text, pattern, 10 /* max errors */);
+      // console.log(matches);
+      // var match = matches[0];
+      // console.log("found matching substring:")
+      // console.log(text.substring(match.start, match.end))
+      let {found, id, type, start, end } = findInScript(pattern);
+      // console.log(found, id, start, end);
+      if (found == true) {
+        console.log('sending: ', { id, type, start, end});
+        socket.emit('found', { id, type, start, end });
+      } else {
+        console.log('...not found.');
+      }
+    });
   }
 );
+
+
+//
+function findInScript(pattern, maxErrors = 10) {
+
+  let data = JSON.parse(scriptJSON);
+
+  let id, start, end;
+  let found = false;
+
+  // iterate over lines if we are dealing with a multi-line selection
+  for (let i=0; i<data.paragraphs.length; i++) {
+    // console.log(data.paragraphs[i]);
+    let thisPara = data.paragraphs[i];
+
+    const matches = approx.search(thisPara.text, pattern, maxErrors);
+    if (matches.length > 0) {
+      id = thisPara.id;
+      type = thisPara.type;
+      start = matches[0].start;
+      end = matches[0].end;
+      found=true;
+      break;
+    }
+  }
+  return { found, id, type, start, end};
+}
 
 // ======== OpenAI Stuff =========
 
