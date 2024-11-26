@@ -1,12 +1,12 @@
-# radio-writing-tool
+# AI Writing Tool for Live Performance
 
 ![image](https://github.com/user-attachments/assets/83601c4b-dc40-47f3-a90b-d715c5bc3df8)
 
-AI Co-Authoring tool for live performance
+## About
+
+This was developed for the NYC Media Lab and Bertelsmann Creative Industries and AI Challenge, Fall 2023. I lead a fabulous team with Patrick Coleman, Ash Smith, Ryan Schmaltz, and Jinku Kim. Our project employs AI for pre-preproduction (co-creation and world building) and performance (scripts as live artifacts, real-time AI).
 
 See [https://roberttwomey.com/2023/12/nyc-media-lab-x-bertelsmann-ai-and-creative-industry-challenge/](https://roberttwomey.com/2023/12/nyc-media-lab-x-bertelsmann-ai-and-creative-industry-challenge/)
-
-Developed for the NYC Media Lab and Bertelsmann Creative Industries and AI Challenge.
 
 Read more here: [https://engineering.nyu.edu/research-innovation/entrepreneurship/nyc-media-lab/projects/creative-industries-and-ai-challenge](https://engineering.nyu.edu/research-innovation/entrepreneurship/nyc-media-lab/projects/creative-industries-and-ai-challenge)
 
