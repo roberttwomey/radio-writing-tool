@@ -1,5 +1,14 @@
 # radio-writing-tool
+
+![image](https://github.com/user-attachments/assets/83601c4b-dc40-47f3-a90b-d715c5bc3df8)
+
 AI Co-Authoring tool for live performance
+
+See [https://roberttwomey.com/2023/12/nyc-media-lab-x-bertelsmann-ai-and-creative-industry-challenge/](https://roberttwomey.com/2023/12/nyc-media-lab-x-bertelsmann-ai-and-creative-industry-challenge/)
+
+Developed for the NYC Media Lab and Bertelsmann Creative Industries and AI Challenge.
+
+Read more here: [https://engineering.nyu.edu/research-innovation/entrepreneurship/nyc-media-lab/projects/creative-industries-and-ai-challenge](https://engineering.nyu.edu/research-innovation/entrepreneurship/nyc-media-lab/projects/creative-industries-and-ai-challenge)
 
 ## Setup
 
